@@ -52,6 +52,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "calendar", selected: "calendar.badge.checkmark" }} />
         <Label>{t("tabs", "calendar")}</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="numbers">
+        <Icon sf={{ default: "phone.circle", selected: "phone.circle.fill" }} />
+        <Label>أرقام مهمة</Label>
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
@@ -97,6 +101,7 @@ function ClassicTabLayout() {
       <Tabs.Screen name="culture" options={{ title: t("tabs", "culture"), tabBarIcon: ({ color, size }) => <Ionicons name="color-palette" size={size} color={color} /> }} />
       <Tabs.Screen name="social" options={{ title: t("tabs", "community"), tabBarIcon: ({ color, size }) => <Ionicons name="chatbubbles" size={size} color={color} /> }} />
       <Tabs.Screen name="calendar" options={{ title: t("tabs", "calendar"), tabBarIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} /> }} />
+      <Tabs.Screen name="numbers" options={{ title: "أرقام مهمة", tabBarIcon: ({ color, size }) => <Ionicons name="call" size={size} color={color} /> }} />
       <Tabs.Screen name="settings" options={{ title: t("tabs", "admin"), href: null }} />
     </Tabs>
   );

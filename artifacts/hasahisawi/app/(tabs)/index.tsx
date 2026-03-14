@@ -4,12 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Platform,
   ImageBackground,
   Dimensions,
-  Linking,
-  Image,
 } from "react-native";
 import Animated, { FadeInDown, FadeIn, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -37,25 +34,6 @@ type ServiceItem = {
   route: any;
   iconType: "ionicons" | "material";
 };
-
-type ImportantNumber = {
-  id: string;
-  name: string;
-  number: string;
-  icon: string;
-  color: string;
-};
-
-const IMPORTANT_NUMBERS: ImportantNumber[] = [
-  { id: "police",    name: "الشرطة",           number: "999",      icon: "shield",           color: "#3B82F6" },
-  { id: "ambulance", name: "الإسعاف",           number: "998",      icon: "medkit",           color: "#EF4444" },
-  { id: "fire",      name: "الإطفاء",           number: "998",      icon: "flame",            color: "#F97316" },
-  { id: "hospital",  name: "مستشفى الحصاحيصا", number: "0151234567", icon: "hospital",        color: "#2D8A96" },
-  { id: "water",     name: "مياه الشرب",        number: "0152345678", icon: "water",           color: "#06B6D4" },
-  { id: "electric",  name: "الكهرباء",          number: "0153456789", icon: "flash",           color: "#EAB308" },
-  { id: "locality",  name: "المحلية",           number: "0154567890", icon: "business",        color: "#8B5CF6" },
-  { id: "civil",     name: "السجل المدني",      number: "0155678901", icon: "card",            color: "#E07830" },
-];
 
 function ServiceGridItem({
   item,
@@ -87,32 +65,6 @@ function ServiceGridItem({
   );
 }
 
-function ImportantNumberCard({ item, index }: { item: ImportantNumber; index: number }) {
-  const handleCall = () => {
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      Linking.openURL(`tel:${item.number}`);
-    }
-  };
-  return (
-    <Animated.View entering={FadeInDown.delay(100 + index * 60).springify().damping(16)} style={styles.numCard}>
-      <AnimatedPress onPress={handleCall}>
-        <View style={styles.numCardInner}>
-          <View style={[styles.numIconWrap, { backgroundColor: item.color + "20" }]}>
-            <Ionicons name={item.icon as any} size={22} color={item.color} />
-          </View>
-          <View style={styles.numInfo}>
-            <Text style={styles.numName} numberOfLines={1}>{item.name}</Text>
-            <Text style={[styles.numDigits, { color: item.color }]}>{item.number}</Text>
-          </View>
-          <View style={[styles.callBtn, { backgroundColor: item.color + "20", borderColor: item.color + "50" }]}>
-            <Ionicons name="call" size={16} color={item.color} />
-          </View>
-        </View>
-      </AnimatedPress>
-    </Animated.View>
-  );
-}
 
 export default function HomeScreen() {
   const { t, isRTL, lang } = useLang();
@@ -285,38 +237,6 @@ export default function HomeScreen() {
 
       <View style={styles.body}>
 
-        {/* قسم الأرقام المهمة */}
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
-          <View style={styles.importantNumsBox}>
-            {/* رأس القسم */}
-            <LinearGradient
-              colors={[Colors.primary + "30", Colors.accent + "20"]}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              style={styles.importantNumsHeader}
-            >
-              <View style={styles.importantNumsHeaderLeft}>
-                <View style={styles.importantNumsIconWrap}>
-                  <Ionicons name="call" size={20} color={Colors.primary} />
-                </View>
-                <View>
-                  <Text style={styles.importantNumsTitle}>الأرقام المهمة</Text>
-                  <Text style={styles.importantNumsSub}>اضغط للاتصال المباشر</Text>
-                </View>
-              </View>
-              <View style={styles.importantNumsBadge}>
-                <Text style={styles.importantNumsBadgeText}>{IMPORTANT_NUMBERS.length}</Text>
-              </View>
-            </LinearGradient>
-
-            {/* الشبكة */}
-            <View style={styles.numGrid}>
-              {IMPORTANT_NUMBERS.map((item, idx) => (
-                <ImportantNumberCard key={item.id} item={item} index={idx} />
-              ))}
-            </View>
-          </View>
-        </Animated.View>
-
         {/* Services Section */}
         <View style={[styles.sectionHeader, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
           <Text style={styles.sectionTitle}>{t('home','services')}</Text>
@@ -346,6 +266,14 @@ export default function HomeScreen() {
               </View>
             </AnimatedPress>
           )}
+
+          <AnimatedPress onPress={() => handlePress("/(tabs)/numbers")}>
+            <View style={[styles.actionStrip, { marginTop: 12, borderColor: Colors.primary + "40" }]}>
+              <Ionicons name="call-outline" size={20} color={Colors.primary} />
+              <Text style={[styles.actionText, { color: Colors.primary }]}>الأرقام المهمة</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textSecondary} />
+            </View>
+          </AnimatedPress>
 
           <AnimatedPress onPress={() => handlePress("/(tabs)/settings")}>
             <View style={[styles.actionStrip, { marginTop: 12, borderColor: Colors.accent + "40" }]}>
@@ -424,111 +352,6 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 16,
     paddingTop: 24,
-  },
-
-  /* ===== IMPORTANT NUMBERS ===== */
-  importantNumsBox: {
-    borderRadius: 20,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: Colors.primary + "30",
-    marginBottom: 28,
-  },
-  importantNumsHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  importantNumsHeaderLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  importantNumsIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: Colors.primary + "25",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.primary + "40",
-  },
-  importantNumsTitle: {
-    fontFamily: "Cairo_700Bold",
-    fontSize: 17,
-    color: "#FFFFFF",
-  },
-  importantNumsSub: {
-    fontFamily: "Cairo_400Regular",
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 1,
-  },
-  importantNumsBadge: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    minWidth: 32,
-    alignItems: "center",
-  },
-  importantNumsBadgeText: {
-    fontFamily: "Cairo_700Bold",
-    fontSize: 14,
-    color: "#FFFFFF",
-  },
-  numGrid: {
-    backgroundColor: Colors.cardBg,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 6,
-  },
-  numCard: {
-    marginBottom: 2,
-  },
-  numCardInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.bg,
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: Colors.divider,
-    gap: 12,
-  },
-  numIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  numInfo: {
-    flex: 1,
-  },
-  numName: {
-    fontFamily: "Cairo_600SemiBold",
-    fontSize: 14,
-    color: Colors.textPrimary,
-    textAlign: "right",
-  },
-  numDigits: {
-    fontFamily: "Cairo_700Bold",
-    fontSize: 16,
-    marginTop: 2,
-    textAlign: "right",
-    letterSpacing: 1,
-  },
-  callBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 
   /* ===== SERVICES ===== */
