@@ -300,6 +300,7 @@ function CommentsModal({
   visible,
   onClose,
   isAdmin,
+  isGuest,
   defaultName,
   adminToken,
 }: {
@@ -307,6 +308,7 @@ function CommentsModal({
   visible: boolean;
   onClose: () => void;
   isAdmin: boolean;
+  isGuest: boolean;
   defaultName: string;
   adminToken?: string | null;
 }) {
@@ -334,6 +336,14 @@ function CommentsModal({
 
   const sendComment = async () => {
     if (!text.trim() || !post) return;
+    if (isGuest) {
+      Alert.alert(
+        tr("تسجيل مطلوب", "Login Required"),
+        tr("يجب إنشاء حساب للتعليق على المنشورات.", "You need an account to comment on posts."),
+        [{ text: tr("حسناً", "OK") }]
+      );
+      return;
+    }
     setSending(true);
     try {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -643,7 +653,17 @@ export default function SocialScreen() {
       <View style={[styles.header, { paddingTop: topPad + 16, flexDirection: isRTL ? "row-reverse" : "row" }]}>
         <AnimatedPress
           style={[styles.addBtn, { flexDirection: isRTL ? "row-reverse" : "row" }]}
-          onPress={() => setShowAdd(true)}
+          onPress={() => {
+            if (auth.isGuest) {
+              Alert.alert(
+                tr("تسجيل مطلوب", "Login Required"),
+                tr("يجب إنشاء حساب للنشر في المجتمع.", "You need an account to post in the community."),
+                [{ text: tr("حسناً", "OK") }]
+              );
+              return;
+            }
+            setShowAdd(true);
+          }}
         >
           <Ionicons name="add" size={20} color="#fff" />
           <Text style={styles.addBtnText}>{t('social', 'post')}</Text>
@@ -726,6 +746,7 @@ export default function SocialScreen() {
         visible={showComments}
         onClose={() => setShowComments(false)}
         isAdmin={isAdmin}
+        isGuest={auth.isGuest}
         defaultName={userName}
         adminToken={auth.token}
       />

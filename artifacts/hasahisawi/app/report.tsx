@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
+import { useAuth } from "@/lib/auth-context";
 import type { LostItem } from "./(tabs)/missing";
 import { LOST_ITEMS_KEY } from "./(tabs)/missing";
 
@@ -30,6 +31,7 @@ const CATEGORIES: { key: LostItem["category"]; label: string; icon: string }[] =
 
 export default function ReportScreen() {
   const insets = useSafeAreaInsets();
+  const auth = useAuth();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -69,6 +71,30 @@ export default function ReportScreen() {
       setSaving(false);
     }
   };
+
+  if (auth.isGuest || !auth.user) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center", paddingHorizontal: 32 }]}>
+        <View style={{ paddingTop: topPad + 16, position: "absolute", top: 0, left: 0, right: 0, paddingHorizontal: 16 }}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Ionicons name="chevron-forward" size={22} color={Colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: Colors.cardBg, borderRadius: 20, padding: 28, alignItems: "center", borderWidth: 1, borderColor: Colors.primary + "44" }}>
+          <Ionicons name="lock-closed" size={48} color={Colors.primary} style={{ marginBottom: 16 }} />
+          <Text style={{ fontFamily: "Cairo_700Bold", fontSize: 20, color: Colors.textPrimary, marginBottom: 8, textAlign: "center" }}>
+            تسجيل مطلوب
+          </Text>
+          <Text style={{ fontFamily: "Cairo_400Regular", fontSize: 14, color: Colors.textSecondary, textAlign: "center", lineHeight: 22, marginBottom: 24 }}>
+            يجب إنشاء حساب للإبلاغ عن المفقودات والتواصل مع المجتمع.
+          </Text>
+          <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: Colors.primary, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 28 }}>
+            <Text style={{ fontFamily: "Cairo_600SemiBold", fontSize: 15, color: Colors.cardBg }}>العودة</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

@@ -21,6 +21,7 @@ import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import AnimatedPress from "@/components/AnimatedPress";
 import Colors from "@/constants/colors";
 import { useLang } from "@/lib/lang-context";
+import { useAuth } from "@/lib/auth-context";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -587,6 +588,7 @@ function AddAuctionModal({
 
 export default function MarketScreen() {
   const { t, isRTL, tr } = useLang();
+  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
@@ -699,7 +701,17 @@ export default function MarketScreen() {
       <View style={[styles.header, { paddingTop: topPad + 14, flexDirection: isRTL ? "row-reverse" : "row" }]}>
         <AnimatedPress
           style={[styles.addBtn, tab === "auction" && { backgroundColor: Colors.violet }, { flexDirection: isRTL ? "row-reverse" : "row" }]}
-          onPress={() => tab === "family" ? setShowFamilyModal(true) : setShowAuctionModal(true)}
+          onPress={() => {
+            if (auth.isGuest) {
+              Alert.alert(
+                tr("تسجيل مطلوب", "Login Required"),
+                tr("يجب إنشاء حساب لإضافة عروض في السوق.", "You need an account to add items to the market."),
+                [{ text: tr("حسناً", "OK") }]
+              );
+              return;
+            }
+            tab === "family" ? setShowFamilyModal(true) : setShowAuctionModal(true);
+          }}
         >
           <Ionicons name="add" size={20} color={Colors.cardBg} />
           <Text style={styles.addBtnText}>{t("common", "add")}</Text>

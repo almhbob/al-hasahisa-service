@@ -20,6 +20,7 @@ import AnimatedPress from "@/components/AnimatedPress";
 import Colors from "@/constants/colors";
 
 import { useLang } from "@/lib/lang-context";
+import { useAuth } from "@/lib/auth-context";
 
 function contactOptions(phone: string, t: any) {
   if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -199,7 +200,8 @@ function ItemCard({
 }
 
 export default function LostItemsScreen() {
-  const { t, isRTL, lang } = useLang();
+  const { t, isRTL, lang, tr } = useLang();
+  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const [items, setItems] = useState<LostItem[]>([]);
@@ -243,7 +245,17 @@ export default function LostItemsScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: topPad + 16, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <AnimatedPress style={[styles.addBtn, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} onPress={() => router.push("/report")}>
+        <AnimatedPress style={[styles.addBtn, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} onPress={() => {
+          if (auth.isGuest) {
+            Alert.alert(
+              tr("تسجيل مطلوب", "Login Required"),
+              tr("يجب إنشاء حساب للإبلاغ عن المفقودات.", "You need an account to report lost items."),
+              [{ text: tr("حسناً", "OK") }]
+            );
+            return;
+          }
+          router.push("/report");
+        }}>
           <Ionicons name="add" size={20} color={Colors.cardBg} />
           <Text style={styles.addBtnText}>{t('missing', 'reportLost')}</Text>
         </AnimatedPress>

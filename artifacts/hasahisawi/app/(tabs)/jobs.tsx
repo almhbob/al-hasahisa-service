@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { useLang } from "@/lib/lang-context";
+import { useAuth } from "@/lib/auth-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import AnimatedPress from "@/components/AnimatedPress";
 
@@ -231,6 +232,7 @@ function AddJobModal({
 
 export default function JobsScreen() {
   const { t, isRTL, tr } = useLang();
+  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -313,7 +315,17 @@ export default function JobsScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: topPad + 16, flexDirection: isRTL ? "row-reverse" : "row" }]}>
-        <AnimatedPress onPress={() => setShowModal(true)}>
+        <AnimatedPress onPress={() => {
+          if (auth.isGuest) {
+            Alert.alert(
+              tr("تسجيل مطلوب", "Login Required"),
+              tr("يجب إنشاء حساب لنشر إعلانات الوظائف.", "You need an account to post job listings."),
+              [{ text: tr("حسناً", "OK") }]
+            );
+            return;
+          }
+          setShowModal(true);
+        }}>
           <View style={[styles.addBtn, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
             <Ionicons name="add" size={20} color={Colors.cardBg} />
             <Text style={styles.addBtnText}>{t("jobs", "postJob")}</Text>
