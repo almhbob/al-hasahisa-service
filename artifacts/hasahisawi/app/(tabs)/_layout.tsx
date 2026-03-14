@@ -20,13 +20,13 @@ function NativeTabLayout() {
         <Icon sf={{ default: "cross.case", selected: "cross.case.fill" }} />
         <Label>{t("tabs", "medical")}</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="appointments">
+        <Icon sf={{ default: "calendar.badge.plus", selected: "calendar.badge.plus" }} />
+        <Label>حجز موعد</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="missing">
         <Icon sf={{ default: "magnifyingglass.circle", selected: "magnifyingglass.circle.fill" }} />
         <Label>{t("tabs", "missing")}</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="student">
-        <Icon sf={{ default: "graduationcap", selected: "graduationcap.fill" }} />
-        <Label>{t("tabs", "students")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="jobs">
         <Icon sf={{ default: "briefcase", selected: "briefcase.fill" }} />
@@ -35,6 +35,10 @@ function NativeTabLayout() {
       <NativeTabs.Trigger name="market">
         <Icon sf={{ default: "storefront", selected: "storefront.fill" }} />
         <Label>{t("tabs", "market")}</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="student">
+        <Icon sf={{ default: "graduationcap", selected: "graduationcap.fill" }} />
+        <Label>{t("tabs", "students")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="sports">
         <Icon sf={{ default: "sportscourt", selected: "sportscourt.fill" }} />
@@ -47,6 +51,14 @@ function NativeTabLayout() {
       <NativeTabs.Trigger name="social">
         <Icon sf={{ default: "bubble.left.and.bubble.right", selected: "bubble.left.and.bubble.right.fill" }} />
         <Label>{t("tabs", "community")}</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="women">
+        <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
+        <Label>ركن المرأة</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="orgs">
+        <Icon sf={{ default: "heart.circle", selected: "heart.circle.fill" }} />
+        <Label>المنظمات</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="calendar">
         <Icon sf={{ default: "calendar", selected: "calendar.badge.checkmark" }} />
@@ -91,18 +103,21 @@ function ClassicTabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t("tabs", "home"), tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} /> }} />
-      <Tabs.Screen name="medical" options={{ title: t("tabs", "medical"), tabBarIcon: ({ color, size }) => <Ionicons name="medkit" size={size} color={color} /> }} />
-      <Tabs.Screen name="missing" options={{ title: t("tabs", "missing"), tabBarIcon: ({ color, size }) => <Ionicons name="search" size={size} color={color} /> }} />
-      <Tabs.Screen name="student" options={{ title: t("tabs", "students"), tabBarIcon: ({ color, size }) => <Ionicons name="school" size={size} color={color} /> }} />
-      <Tabs.Screen name="jobs" options={{ title: t("tabs", "jobs"), tabBarIcon: ({ color, size }) => <Ionicons name="briefcase" size={size} color={color} /> }} />
-      <Tabs.Screen name="market" options={{ title: t("tabs", "market"), tabBarIcon: ({ color, size }) => <Ionicons name="storefront" size={size} color={color} /> }} />
-      <Tabs.Screen name="sports" options={{ title: t("tabs", "sports"), tabBarIcon: ({ color, size }) => <Ionicons name="football" size={size} color={color} /> }} />
-      <Tabs.Screen name="culture" options={{ title: t("tabs", "culture"), tabBarIcon: ({ color, size }) => <Ionicons name="color-palette" size={size} color={color} /> }} />
-      <Tabs.Screen name="social" options={{ title: t("tabs", "community"), tabBarIcon: ({ color, size }) => <Ionicons name="chatbubbles" size={size} color={color} /> }} />
-      <Tabs.Screen name="calendar" options={{ title: t("tabs", "calendar"), tabBarIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} /> }} />
-      <Tabs.Screen name="numbers" options={{ title: "أرقام مهمة", tabBarIcon: ({ color, size }) => <Ionicons name="call" size={size} color={color} /> }} />
-      <Tabs.Screen name="settings" options={{ title: t("tabs", "admin"), href: null }} />
+      <Tabs.Screen name="index"        options={{ title: t("tabs", "home"),      tabBarIcon: ({ color, size }) => <Ionicons name="home"           size={size} color={color} /> }} />
+      <Tabs.Screen name="medical"      options={{ title: t("tabs", "medical"),   tabBarIcon: ({ color, size }) => <Ionicons name="medkit"         size={size} color={color} /> }} />
+      <Tabs.Screen name="appointments" options={{ title: "حجز موعد",             tabBarIcon: ({ color, size }) => <Ionicons name="calendar"       size={size} color={color} /> }} />
+      <Tabs.Screen name="missing"      options={{ title: t("tabs", "missing"),   tabBarIcon: ({ color, size }) => <Ionicons name="search"         size={size} color={color} /> }} />
+      <Tabs.Screen name="student"      options={{ title: t("tabs", "students"),  tabBarIcon: ({ color, size }) => <Ionicons name="school"         size={size} color={color} /> }} />
+      <Tabs.Screen name="jobs"         options={{ title: t("tabs", "jobs"),      tabBarIcon: ({ color, size }) => <Ionicons name="briefcase"      size={size} color={color} /> }} />
+      <Tabs.Screen name="market"       options={{ title: t("tabs", "market"),    tabBarIcon: ({ color, size }) => <Ionicons name="storefront"     size={size} color={color} /> }} />
+      <Tabs.Screen name="sports"       options={{ title: t("tabs", "sports"),    tabBarIcon: ({ color, size }) => <Ionicons name="football"       size={size} color={color} /> }} />
+      <Tabs.Screen name="culture"      options={{ title: t("tabs", "culture"),   tabBarIcon: ({ color, size }) => <Ionicons name="color-palette"  size={size} color={color} /> }} />
+      <Tabs.Screen name="social"       options={{ title: t("tabs", "community"), tabBarIcon: ({ color, size }) => <Ionicons name="chatbubbles"    size={size} color={color} /> }} />
+      <Tabs.Screen name="women"        options={{ title: "ركن المرأة",            tabBarIcon: ({ color, size }) => <Ionicons name="person-circle" size={size} color={color} /> }} />
+      <Tabs.Screen name="orgs"         options={{ title: t("tabs", "orgs"),      tabBarIcon: ({ color, size }) => <Ionicons name="people"         size={size} color={color} /> }} />
+      <Tabs.Screen name="calendar"     options={{ title: t("tabs", "calendar"),  tabBarIcon: ({ color, size }) => <Ionicons name="calendar"       size={size} color={color} /> }} />
+      <Tabs.Screen name="numbers"      options={{ title: "أرقام مهمة",           tabBarIcon: ({ color, size }) => <Ionicons name="call"           size={size} color={color} /> }} />
+      <Tabs.Screen name="settings"     options={{ title: t("tabs", "admin"), href: null }} />
     </Tabs>
   );
 }

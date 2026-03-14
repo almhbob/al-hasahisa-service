@@ -77,7 +77,9 @@ export default function HomeScreen() {
     { id: "social",    label: t('home','social').label,          sub: t('home','social').sub,           icon: "chatbubbles",       iconType: "ionicons"  as const, color: "#00CFFF", bg: "#00CFFF20", route: "/(tabs)/social"    as const },
     { id: "calendar",  label: t('home','calendarService').label, sub: t('home','calendarService').sub,  icon: "calendar",          iconType: "ionicons"  as const, color: Colors.accent, bg: Colors.accent+"20", route: "/(tabs)/calendar"  as const },
     { id: "women",     label: t('home','womenService').label,    sub: t('home','womenService').sub,     icon: "face-woman",        iconType: "material"  as const, color: "#FF4FA3", bg: "#FF4FA320", route: "/(tabs)/women"     as const },
-    { id: "orgs",      label: t('home','orgsService').label,     sub: t('home','orgsService').sub,      icon: "hand-heart",        iconType: "material"  as const, color: "#A855F7", bg: "#A855F720", route: "/(tabs)/orgs"      as const },
+    { id: "orgs",        label: t('home','orgsService').label,     sub: t('home','orgsService').sub,      icon: "hand-heart",        iconType: "material"  as const, color: "#A855F7", bg: "#A855F720", route: "/(tabs)/orgs"         as const },
+    { id: "appointments",label: "حجز المواعيد",                    sub: "صحي وحكومي",                     icon: "calendar",          iconType: "ionicons"  as const, color: Colors.accent,  bg: Colors.accent+"20",    route: "/(tabs)/appointments" as const },
+    { id: "numbers",   label: "أرقام مهمة",                       sub: "طوارئ وخدمات",                   icon: "call",              iconType: "ionicons"  as const, color: "#00CFFF",  bg: "#00CFFF20",    route: "/(tabs)/numbers"      as const },
   ], [lang]);
 
   const handlePress = (route: string) => {
@@ -196,6 +198,28 @@ export default function HomeScreen() {
           </LinearGradient>
         </Animated.View>
 
+        {/* بانر حجز المواعيد */}
+        <Animated.View entering={FadeInDown.delay(120).springify()} style={{ marginHorizontal: 0, marginBottom: 16 }}>
+          <AnimatedPress onPress={() => handlePress("/(tabs)/appointments")}>
+            <LinearGradient
+              colors={[Colors.accent + "22", Colors.primary + "18", Colors.accent + "10"]}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              style={styles.apptBanner}
+            >
+              <View style={[styles.apptBannerIcon, { borderColor: Colors.accent + "50" }]}>
+                <Ionicons name="calendar" size={26} color={Colors.accent} />
+              </View>
+              <View style={{ flex: 1, marginHorizontal: 12 }}>
+                <Text style={styles.apptBannerTitle}>احجز موعدك الآن</Text>
+                <Text style={styles.apptBannerSub}>مستشفيات · عيادات · سجل مدني · محلية</Text>
+              </View>
+              <View style={[styles.apptBannerArrow, { backgroundColor: Colors.accent }]}>
+                <Ionicons name="arrow-forward" size={16} color="#000" />
+              </View>
+            </LinearGradient>
+          </AnimatedPress>
+        </Animated.View>
+
         {/* عنوان قسم الخدمات */}
         <Animated.View entering={FadeInRight.delay(150).springify()} style={[styles.sectionHeader, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
           <LinearGradient
@@ -252,14 +276,6 @@ export default function HomeScreen() {
               </LinearGradient>
             </AnimatedPress>
           )}
-
-          <AnimatedPress onPress={() => handlePress("/(tabs)/numbers")}>
-            <View style={[styles.actionStrip, { marginTop: 10, borderColor: Colors.cyber + "40" }]}>
-              <Ionicons name="call-outline" size={20} color={Colors.cyber} />
-              <Text style={[styles.actionText, { color: Colors.cyber }]}>الأرقام المهمة</Text>
-              <Ionicons name="chevron-forward" size={16} color={Colors.cyber + "80"} />
-            </View>
-          </AnimatedPress>
 
           <AnimatedPress onPress={() => handlePress("/(tabs)/settings")}>
             <View style={[styles.actionStrip, { marginTop: 10, borderColor: Colors.violet + "40" }]}>
@@ -439,6 +455,29 @@ const styles = StyleSheet.create({
   },
   gridBottomLine: {
     position: "absolute", bottom: 0, left: 16, right: 16, height: 2, borderRadius: 1, opacity: 0.6,
+  },
+
+  /* Appointments Banner */
+  apptBanner: {
+    flexDirection: "row", alignItems: "center", borderRadius: 18,
+    padding: 16, borderWidth: 1, borderColor: Colors.accent + "40",
+    overflow: "hidden",
+  },
+  apptBannerIcon: {
+    width: 50, height: 50, borderRadius: 14,
+    backgroundColor: Colors.accent + "20",
+    justifyContent: "center", alignItems: "center",
+    borderWidth: 1,
+  },
+  apptBannerTitle: {
+    fontFamily: "Cairo_700Bold", fontSize: 16, color: Colors.textPrimary,
+  },
+  apptBannerSub: {
+    fontFamily: "Cairo_400Regular", fontSize: 12, color: Colors.textSecondary, marginTop: 2,
+  },
+  apptBannerArrow: {
+    width: 32, height: 32, borderRadius: 10,
+    justifyContent: "center", alignItems: "center",
   },
 
   /* Footer */
