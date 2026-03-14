@@ -20,6 +20,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "cross.case", selected: "cross.case.fill" }} />
         <Label>{t("tabs", "medical")}</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="reports">
+        <Icon sf={{ default: "exclamationmark.bubble", selected: "exclamationmark.bubble.fill" }} />
+        <Label>بلاغات</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="appointments">
         <Icon sf={{ default: "calendar.badge.plus", selected: "calendar.badge.plus" }} />
         <Label>حجز موعد</Label>
@@ -105,6 +109,7 @@ function ClassicTabLayout() {
     >
       <Tabs.Screen name="index"        options={{ title: t("tabs", "home"),      tabBarIcon: ({ color, size }) => <Ionicons name="home"           size={size} color={color} /> }} />
       <Tabs.Screen name="medical"      options={{ title: t("tabs", "medical"),   tabBarIcon: ({ color, size }) => <Ionicons name="medkit"         size={size} color={color} /> }} />
+      <Tabs.Screen name="reports"      options={{ title: "بلاغات",               tabBarIcon: ({ color, size }) => <Ionicons name="megaphone"      size={size} color={color} /> }} />
       <Tabs.Screen name="appointments" options={{ title: "حجز موعد",             tabBarIcon: ({ color, size }) => <Ionicons name="calendar"       size={size} color={color} /> }} />
       <Tabs.Screen name="missing"      options={{ title: t("tabs", "missing"),   tabBarIcon: ({ color, size }) => <Ionicons name="search"         size={size} color={color} /> }} />
       <Tabs.Screen name="student"      options={{ title: t("tabs", "students"),  tabBarIcon: ({ color, size }) => <Ionicons name="school"         size={size} color={color} /> }} />

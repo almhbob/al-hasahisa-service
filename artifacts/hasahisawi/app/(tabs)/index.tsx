@@ -79,6 +79,7 @@ export default function HomeScreen() {
     { id: "women",     label: t('home','womenService').label,    sub: t('home','womenService').sub,     icon: "face-woman",        iconType: "material"  as const, color: "#FF4FA3", bg: "#FF4FA320", route: "/(tabs)/women"     as const },
     { id: "orgs",        label: t('home','orgsService').label,     sub: t('home','orgsService').sub,      icon: "hand-heart",        iconType: "material"  as const, color: "#A855F7", bg: "#A855F720", route: "/(tabs)/orgs"         as const },
     { id: "appointments",label: "حجز المواعيد",                    sub: "صحي وحكومي",                     icon: "calendar",          iconType: "ionicons"  as const, color: Colors.accent,  bg: Colors.accent+"20",    route: "/(tabs)/appointments" as const },
+    { id: "reports",   label: "التبليغ السريع",                   sub: "مياه · كهرباء · بيئة",           icon: "megaphone",         iconType: "ionicons"  as const, color: Colors.danger,  bg: Colors.danger+"20",    route: "/(tabs)/reports"      as const },
     { id: "numbers",   label: "أرقام مهمة",                       sub: "طوارئ وخدمات",                   icon: "call",              iconType: "ionicons"  as const, color: "#00CFFF",  bg: "#00CFFF20",    route: "/(tabs)/numbers"      as const },
   ], [lang]);
 
@@ -198,24 +199,35 @@ export default function HomeScreen() {
           </LinearGradient>
         </Animated.View>
 
-        {/* بانر حجز المواعيد */}
-        <Animated.View entering={FadeInDown.delay(120).springify()} style={{ marginHorizontal: 0, marginBottom: 16 }}>
-          <AnimatedPress onPress={() => handlePress("/(tabs)/appointments")}>
+        {/* بانرات الخدمات السريعة */}
+        <Animated.View entering={FadeInDown.delay(120).springify()} style={styles.quickBannersRow}>
+          {/* حجز المواعيد */}
+          <AnimatedPress style={{ flex: 1 }} onPress={() => handlePress("/(tabs)/appointments")}>
             <LinearGradient
-              colors={[Colors.accent + "22", Colors.primary + "18", Colors.accent + "10"]}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              style={styles.apptBanner}
+              colors={[Colors.accent + "22", Colors.primary + "18"]}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={[styles.quickBanner, { borderColor: Colors.accent + "40" }]}
             >
-              <View style={[styles.apptBannerIcon, { borderColor: Colors.accent + "50" }]}>
-                <Ionicons name="calendar" size={26} color={Colors.accent} />
+              <View style={[styles.quickBannerIcon, { backgroundColor: Colors.accent + "20", borderColor: Colors.accent + "40" }]}>
+                <Ionicons name="calendar" size={22} color={Colors.accent} />
               </View>
-              <View style={{ flex: 1, marginHorizontal: 12 }}>
-                <Text style={styles.apptBannerTitle}>احجز موعدك الآن</Text>
-                <Text style={styles.apptBannerSub}>مستشفيات · عيادات · سجل مدني · محلية</Text>
+              <Text style={styles.quickBannerTitle}>حجز موعد</Text>
+              <Text style={styles.quickBannerSub}>صحي · حكومي</Text>
+            </LinearGradient>
+          </AnimatedPress>
+
+          {/* التبليغ السريع */}
+          <AnimatedPress style={{ flex: 1 }} onPress={() => handlePress("/(tabs)/reports")}>
+            <LinearGradient
+              colors={[Colors.danger + "22", Colors.danger + "08"]}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={[styles.quickBanner, { borderColor: Colors.danger + "40" }]}
+            >
+              <View style={[styles.quickBannerIcon, { backgroundColor: Colors.danger + "20", borderColor: Colors.danger + "40" }]}>
+                <Ionicons name="megaphone" size={22} color={Colors.danger} />
               </View>
-              <View style={[styles.apptBannerArrow, { backgroundColor: Colors.accent }]}>
-                <Ionicons name="arrow-forward" size={16} color="#000" />
-              </View>
+              <Text style={styles.quickBannerTitle}>بلّغ عن مشكلة</Text>
+              <Text style={styles.quickBannerSub}>مياه · كهرباء · طرق</Text>
             </LinearGradient>
           </AnimatedPress>
         </Animated.View>
@@ -457,27 +469,21 @@ const styles = StyleSheet.create({
     position: "absolute", bottom: 0, left: 16, right: 16, height: 2, borderRadius: 1, opacity: 0.6,
   },
 
-  /* Appointments Banner */
-  apptBanner: {
-    flexDirection: "row", alignItems: "center", borderRadius: 18,
-    padding: 16, borderWidth: 1, borderColor: Colors.accent + "40",
-    overflow: "hidden",
+  /* Quick Banners Row */
+  quickBannersRow: { flexDirection: "row", gap: 12, marginBottom: 16 },
+  quickBanner: {
+    borderRadius: 18, padding: 16, borderWidth: 1,
+    overflow: "hidden", alignItems: "center", gap: 8,
   },
-  apptBannerIcon: {
+  quickBannerIcon: {
     width: 50, height: 50, borderRadius: 14,
-    backgroundColor: Colors.accent + "20",
-    justifyContent: "center", alignItems: "center",
-    borderWidth: 1,
+    justifyContent: "center", alignItems: "center", borderWidth: 1,
   },
-  apptBannerTitle: {
-    fontFamily: "Cairo_700Bold", fontSize: 16, color: Colors.textPrimary,
+  quickBannerTitle: {
+    fontFamily: "Cairo_700Bold", fontSize: 15, color: Colors.textPrimary, textAlign: "center",
   },
-  apptBannerSub: {
-    fontFamily: "Cairo_400Regular", fontSize: 12, color: Colors.textSecondary, marginTop: 2,
-  },
-  apptBannerArrow: {
-    width: 32, height: 32, borderRadius: 10,
-    justifyContent: "center", alignItems: "center",
+  quickBannerSub: {
+    fontFamily: "Cairo_400Regular", fontSize: 11, color: Colors.textSecondary, textAlign: "center",
   },
 
   /* Footer */
