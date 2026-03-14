@@ -73,7 +73,7 @@ export const translations = {
       medical: { label: "الدليل الطبي", sub: "صيدليات · مستشفيات · عيادات" },
       lost: { label: "مفقودات", sub: "أعلن عن غرض مفقود أو موجود" },
       student: { label: "الخدمات الطلابية", sub: "مدارس · معاهد · التعليم" },
-      jobsService: { label: "سوق العمل", sub: "وظائف وفرص عمل محلية" },
+      jobsService: { label: "وظائف", sub: "وظائف وفرص عمل محلية" },
       marketService: { label: "السوق", sub: "الأسر المنتجة · دلالة وأدوات مستعملة" },
       sports: { label: "النشاط الرياضي", sub: "الأندية · الفعاليات · البطولات" },
       culture: { label: "النشاط الثقافي", sub: "مراكز ثقافية · معارض · فعاليات" },
@@ -129,7 +129,7 @@ export const translations = {
       },
     },
     jobs: {
-      title: "سوق العمل",
+      title: "وظائف",
       postJob: "أضف وظيفة",
       jobTypes: {
         fulltime: "دوام كامل",
@@ -276,7 +276,7 @@ export const translations = {
       medical: { label: "Medical Guide", sub: "Pharmacies · Hospitals · Clinics" },
       lost: { label: "Lost & Found", sub: "Report lost or found items" },
       student: { label: "Student Services", sub: "Schools · Institutes · Education" },
-      jobsService: { label: "Job Market", sub: "Local jobs and opportunities" },
+      jobsService: { label: "Jobs", sub: "Local jobs and opportunities" },
       marketService: { label: "Market", sub: "Productive families · Used items" },
       sports: { label: "Sports Activity", sub: "Clubs · Events · Tournaments" },
       culture: { label: "Cultural Activity", sub: "Cultural centers · Exhibitions" },
@@ -330,7 +330,7 @@ export const translations = {
       },
     },
     jobs: {
-      title: "Job Market",
+      title: "Jobs",
       postJob: "Post a Job",
       jobTypes: {
         fulltime: "Full-time",
