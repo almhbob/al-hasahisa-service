@@ -18,6 +18,17 @@ async function query(sql: string, params: unknown[] = []) {
 
 const DEFAULT_ADMIN_PIN = "4444";
 
+function maskNationalId(id: string | null | undefined): string | null {
+  if (!id) return null;
+  if (id.length <= 4) return "****";
+  return "*".repeat(id.length - 4) + id.slice(-4);
+}
+
+function safeUserPayload(user: Record<string, unknown>) {
+  const { password_hash, national_id, ...rest } = user;
+  return { ...rest, national_id_masked: maskNationalId(national_id as string) };
+}
+
 export async function initHasahisawiDb() {
   await query(`
     CREATE TABLE IF NOT EXISTS social_posts (
@@ -189,13 +200,13 @@ router.post("/auth/register", async (req: Request, res: Response) => {
     if (!name || !password) return res.status(400).json({ error: "الاسم وكلمة المرور مطلوبان" });
     const hash = await bcrypt.hash(password, 10);
     const result = await query(
-      `INSERT INTO users (name, national_id, phone, email, password_hash) VALUES ($1,$2,$3,$4,$5) RETURNING id, name, role`,
+      `INSERT INTO users (name, national_id, phone, email, password_hash) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
       [name, national_id || null, phone || null, email || null, hash]
     );
     const user = result.rows[0];
     const token = randomBytes(32).toString("hex");
     await query(`INSERT INTO user_sessions (user_id, token) VALUES ($1,$2)`, [user.id, token]);
-    res.json({ user, token });
+    res.json({ user: safeUserPayload(user), token });
   } catch (err: any) {
     if (err.code === "23505") return res.status(400).json({ error: "المستخدم موجود بالفعل" });
     console.error(err);
@@ -240,8 +251,7 @@ router.post("/auth/login", async (req: Request, res: Response) => {
     if (!valid) return res.status(401).json({ error: "بيانات غير صحيحة" });
     const token = randomBytes(32).toString("hex");
     await query(`INSERT INTO user_sessions (user_id, token) VALUES ($1,$2)`, [user.id, token]);
-    const { password_hash, ...safeUser } = user;
-    res.json({ user: safeUser, token });
+    res.json({ user: safeUserPayload(user), token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -258,8 +268,7 @@ router.post("/auth/admin-login", async (req: Request, res: Response) => {
     if (!valid) return res.status(401).json({ error: "بيانات غير صحيحة" });
     const token = randomBytes(32).toString("hex");
     await query(`INSERT INTO user_sessions (user_id, token) VALUES ($1,$2)`, [user.id, token]);
-    const { password_hash, ...safeUser } = user;
-    res.json({ user: safeUser, token });
+    res.json({ user: safeUserPayload(user), token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -450,11 +459,34 @@ router.get("/organizations", async (_req: Request, res: Response) => {
 
 router.get("/posts", async (req: Request, res: Response) => {
   try {
-    const { category } = req.query;
-    let sql = `SELECT p.*, COUNT(l.id)::int AS likes_count FROM social_posts p LEFT JOIN social_likes l ON l.post_id=p.id`;
+    const { category, device_id } = req.query as { category?: string; device_id?: string };
     const params: unknown[] = [];
-    if (category) { sql += ` WHERE p.category=$1`; params.push(category); }
-    sql += ` GROUP BY p.id ORDER BY p.created_at DESC`;
+    let paramIndex = 1;
+
+    let whereClause = "";
+    if (category) {
+      whereClause = ` WHERE p.category=$${paramIndex++}`;
+      params.push(category);
+    }
+
+    const deviceParam = `$${paramIndex++}`;
+    params.push(device_id || "");
+
+    const sql = `
+      SELECT
+        p.*,
+        COUNT(DISTINCT l.id)::int AS likes_count,
+        COUNT(DISTINCT c.id)::int AS comments_count,
+        CASE WHEN EXISTS(
+          SELECT 1 FROM social_likes dl WHERE dl.post_id=p.id AND dl.device_id=${deviceParam}
+        ) THEN true ELSE false END AS liked_by_me
+      FROM social_posts p
+      LEFT JOIN social_likes l ON l.post_id=p.id
+      LEFT JOIN social_comments c ON c.post_id=p.id
+      ${whereClause}
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `;
     const result = await query(sql, params);
     res.json(result.rows);
   } catch (err) {
