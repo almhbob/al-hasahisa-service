@@ -251,11 +251,22 @@ export default function HomeScreen() {
 
         {/* User Auth / Admin Section */}
         <View style={styles.footerActions}>
-          {auth.user ? (
+          {auth.user && !auth.isGuest ? (
             <AnimatedPress onPress={() => auth.logout()}>
               <View style={[styles.actionStrip, { borderColor: Colors.danger + "40" }]}>
                 <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
                 <Text style={[styles.actionText, { color: Colors.danger }]}>{t('auth', 'logout')} ({auth.user.name})</Text>
+              </View>
+            </AnimatedPress>
+          ) : auth.isGuest ? (
+            <AnimatedPress onPress={() => { auth.logout(); setShowAuth(true); }}>
+              <View style={[styles.actionStrip, { borderColor: Colors.accent + "40" }]}>
+                <Ionicons name="eye-outline" size={20} color={Colors.accent} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.actionText, { color: Colors.accent }]}>أنت تتصفح كزائر</Text>
+                  <Text style={{ fontFamily: "Cairo_400Regular", fontSize: 11, color: Colors.textMuted }}>اضغط لتسجيل الدخول والنشر</Text>
+                </View>
+                <Ionicons name="person-circle-outline" size={20} color={Colors.accent} />
               </View>
             </AnimatedPress>
           ) : (

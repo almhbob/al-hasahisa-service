@@ -31,6 +31,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const TOKEN_KEY = "auth_session_token";
 const USER_KEY = "auth_user_data";
+const GUEST_KEY = "auth_is_guest";
 
 function apiUrl(path: string): string {
   return new URL(path, getApiUrl()).toString();
@@ -39,16 +40,23 @@ function apiUrl(path: string): string {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const canPost = !isGuest && user !== null;
 
   useEffect(() => {
     (async () => {
       try {
-        const [savedToken, savedUser] = await Promise.all([
+        const [savedToken, savedUser, savedGuest] = await Promise.all([
           AsyncStorage.getItem(TOKEN_KEY),
           AsyncStorage.getItem(USER_KEY),
+          AsyncStorage.getItem(GUEST_KEY),
         ]);
-        if (savedToken && savedUser) {
+        if (savedGuest === "1" && !savedToken) {
+          setIsGuest(true);
+          setUser({ id: 0, name: "زائر", role: "guest" });
+        } else if (savedToken && savedUser) {
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
         }
@@ -60,10 +68,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const saveSession = async (u: AuthUser, t: string) => {
     setUser(u);
     setToken(t);
+    setIsGuest(false);
     await Promise.all([
       AsyncStorage.setItem(TOKEN_KEY, t),
       AsyncStorage.setItem(USER_KEY, JSON.stringify(u)),
+      AsyncStorage.removeItem(GUEST_KEY),
     ]);
+  };
+
+  const enterAsGuest = () => {
+    setIsGuest(true);
+    setUser({ id: 0, name: "زائر", role: "guest" });
+    setToken(null);
+    AsyncStorage.setItem(GUEST_KEY, "1");
   };
 
   const login = async (phoneOrEmail: string, password: string) => {
@@ -89,7 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (name: string, nationalId: string, phoneOrEmail: string, isEmail: boolean, password: string) => {
-    const body: Record<string, string> = { name, national_id: nationalId, password };
+    if (!phoneOrEmail.trim()) throw new Error("يرجى إدخال البريد الإلكتروني أو رقم الهاتف");
+    const body: Record<string, string> = { name, password };
+    if (nationalId) body.national_id = nationalId;
     if (isEmail) body.email = phoneOrEmail;
     else body.phone = phoneOrEmail;
     const res = await fetch(apiUrl("/api/auth/register"), {
@@ -138,14 +157,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(null);
     setToken(null);
+    setIsGuest(false);
     await Promise.all([
       AsyncStorage.removeItem(TOKEN_KEY),
       AsyncStorage.removeItem(USER_KEY),
+      AsyncStorage.removeItem(GUEST_KEY),
     ]);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, loginAdmin, register, registerAdmin, logout, refreshUser }}>
+    <AuthContext.Provider value={{
+      user, token, isLoading, isGuest, canPost,
+      login, loginAdmin, register, registerAdmin,
+      enterAsGuest, logout, refreshUser,
+    }}>
       {children}
     </AuthContext.Provider>
   );
