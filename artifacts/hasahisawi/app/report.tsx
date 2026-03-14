@@ -87,7 +87,7 @@ export default function ReportScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle-outline" size={17} color={Colors.primaryMid} />
+          <Ionicons name="information-circle-outline" size={17} color={Colors.primaryDim} />
           <Text style={styles.infoText}>
             أدخل تفاصيل الغرض المفقود لمساعدة المجتمع في إيجاده
           </Text>
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
   scroll: { flex: 1 },
   infoBox: {
-    backgroundColor: Colors.primaryMid + "12", borderRadius: 14,
+    backgroundColor: Colors.primaryDim + "12", borderRadius: 14,
     padding: 14, flexDirection: "row-reverse", gap: 10, alignItems: "flex-start",
   },
   infoText: {
     fontFamily: "Cairo_400Regular", fontSize: 13,
-    color: Colors.primaryMid, textAlign: "right", flex: 1, lineHeight: 20,
+    color: Colors.primaryDim, textAlign: "right", flex: 1, lineHeight: 20,
   },
   card: {
     backgroundColor: Colors.cardBg, borderRadius: 18,

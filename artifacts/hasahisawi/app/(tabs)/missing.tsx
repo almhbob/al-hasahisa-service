@@ -76,7 +76,7 @@ const CATEGORY_LABELS: Record<LostItem["category"], string> = {
 const CATEGORY_COLORS: Record<LostItem["category"], string> = {
   phone: "#2E7D9A",
   keys: Colors.accent,
-  wallet: Colors.primaryMid,
+  wallet: Colors.primaryDim,
   documents: "#6A5ACD",
   jewelry: "#C0392B",
   bag: "#E67E22",

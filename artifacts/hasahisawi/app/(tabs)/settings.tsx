@@ -224,7 +224,7 @@ function AddSchoolModal({ visible, onClose, onSave }: {
       Alert.alert(t("common", "error"), t("auth", "fillAll"));
       return;
     }
-    await onSave({ name: name.trim(), type, address: address.trim(), phone: phone.trim(), grades: grades.trim() || undefined, shifts: shifts.trim() || undefined });
+    await onSave({ name: name.trim(), type, address: address.trim(), phone: phone.trim(), grades: grades.trim() || undefined, shifts: shifts.trim() || undefined, services: [], status: "active" as const, createdAt: new Date().toISOString() });
     reset(); onClose();
   };
 
@@ -302,6 +302,9 @@ function AddInstitutionModal({ visible, onClose, onSave }: {
       name: name.trim(), type, address: address.trim(), phone: phone.trim(),
       description: description.trim() || undefined,
       website: website.trim() || undefined,
+      services: [],
+      status: "active" as const,
+      createdAt: new Date().toISOString(),
     });
     reset(); onClose();
   };
@@ -1233,7 +1236,7 @@ export default function SettingsScreen() {
       { text: "إلغاء", style: "cancel" },
       { text: "حذف", style: "destructive", onPress: async () => {
         const current = await loadSchools();
-        await AsyncStorage.setItem(SCHOOLS_KEY, JSON.stringify(current.filter(s => s.id !== id)));
+        await AsyncStorage.setItem(SCHOOLS_KEY, JSON.stringify(current.filter((s: School) => s.id !== id)));
         loadAll();
       }},
     ]);
@@ -1253,7 +1256,7 @@ export default function SettingsScreen() {
       { text: "إلغاء", style: "cancel" },
       { text: "حذف", style: "destructive", onPress: async () => {
         const current = await loadInstitutions();
-        await AsyncStorage.setItem(INSTITUTIONS_KEY, JSON.stringify(current.filter(i => i.id !== id)));
+        await AsyncStorage.setItem(INSTITUTIONS_KEY, JSON.stringify(current.filter((i: Institution) => i.id !== id)));
         loadAll();
       }},
     ]);
@@ -1923,7 +1926,7 @@ export default function SettingsScreen() {
                 style={[styles.subTabBtn, marketSub === "auction" && styles.subTabBtnActive]}
                 onPress={() => setMarketSub("auction")}
               >
-                <Text style={[styles.subTabText, marketSub === "auction" && { color: Colors.navy }]}>دلالة وأدوات ({auctionItems.length})</Text>
+                <Text style={[styles.subTabText, marketSub === "auction" && { color: Colors.violet }]}>دلالة وأدوات ({auctionItems.length})</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.subTabBtn, marketSub === "family" && styles.subTabBtnActive]}
@@ -1967,7 +1970,7 @@ export default function SettingsScreen() {
                     onDelete={!item.id.startsWith("as") ? () => deleteAuctionItem(item.id) : undefined}
                     onAction={item.status === "available" && !item.id.startsWith("as") ? () => markAuctionSold(item.id) : undefined}
                     actionIcon="checkmark-circle-outline"
-                    actionColor={Colors.navy}
+                    actionColor={Colors.violet}
                   />
                 ))
             )}

@@ -97,7 +97,7 @@ const CONDITION_LABELS: Record<AuctionItem["condition"], string> = {
 
 const CONDITION_COLORS: Record<AuctionItem["condition"], string> = {
   new: Colors.success,
-  like_new: Colors.primaryMid,
+  like_new: Colors.primaryDim,
   used: Colors.textMuted,
 };
 
@@ -296,8 +296,8 @@ function AuctionCard({
   return (
     <View style={[styles.card, item.status === "sold" && styles.cardSold]}>
       <View style={[styles.cardTop, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
-        <View style={[styles.cardIcon, { backgroundColor: Colors.navy + "10" }]}>
-          <Ionicons name={AUCTION_CAT_ICONS[item.category] as any} size={26} color={Colors.navy} />
+        <View style={[styles.cardIcon, { backgroundColor: Colors.violet + "10" }]}>
+          <Ionicons name={AUCTION_CAT_ICONS[item.category] as any} size={26} color={Colors.violet} />
         </View>
         <View style={[styles.cardBody, { alignItems: isRTL ? "flex-end" : "flex-start" }]}>
           <View style={[styles.cardTitleRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
@@ -539,7 +539,7 @@ function AddAuctionModal({
                   {(["tools", "electronics", "furniture", "appliances", "clothing", "other"] as AuctionItem["category"][]).map((c) => (
                     <TouchableOpacity
                       key={c}
-                      style={[styles.catPickBtn, category === c && { backgroundColor: Colors.navy, borderColor: Colors.navy }]}
+                      style={[styles.catPickBtn, category === c && { backgroundColor: Colors.violet, borderColor: Colors.violet }]}
                       onPress={() => setCategory(c)}
                     >
                       <Ionicons name={AUCTION_CAT_ICONS[c] as any} size={13} color={category === c ? "#fff" : Colors.textSecondary} />
@@ -571,7 +571,7 @@ function AddAuctionModal({
                   />
                 </View>
               ))}
-              <TouchableOpacity style={[styles.saveBtn, { backgroundColor: Colors.navy, flexDirection: isRTL ? "row-reverse" : "row" }]} onPress={handleSave} activeOpacity={0.85}>
+              <TouchableOpacity style={[styles.saveBtn, { backgroundColor: Colors.violet, flexDirection: isRTL ? "row-reverse" : "row" }]} onPress={handleSave} activeOpacity={0.85}>
                 <Ionicons name="hammer-outline" size={18} color={Colors.cardBg} />
                 <Text style={styles.saveBtnText}>{tr("نشر الإعلان", "Post Ad")}</Text>
               </TouchableOpacity>
@@ -698,7 +698,7 @@ export default function MarketScreen() {
       {/* Header */}
       <View style={[styles.header, { paddingTop: topPad + 14, flexDirection: isRTL ? "row-reverse" : "row" }]}>
         <AnimatedPress
-          style={[styles.addBtn, tab === "auction" && { backgroundColor: Colors.navy }, { flexDirection: isRTL ? "row-reverse" : "row" }]}
+          style={[styles.addBtn, tab === "auction" && { backgroundColor: Colors.violet }, { flexDirection: isRTL ? "row-reverse" : "row" }]}
           onPress={() => tab === "family" ? setShowFamilyModal(true) : setShowAuctionModal(true)}
         >
           <Ionicons name="add" size={20} color={Colors.cardBg} />
@@ -715,12 +715,12 @@ export default function MarketScreen() {
       {/* Tab Switch */}
       <View style={[styles.tabSwitch, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
         <AnimatedPress
-          style={[styles.switchTab, tab === "auction" && styles.switchTabActive, tab === "auction" && { borderColor: Colors.navy }, { flexDirection: isRTL ? "row-reverse" : "row" }]}
+          style={[styles.switchTab, tab === "auction" && styles.switchTabActive, tab === "auction" && { borderColor: Colors.violet }, { flexDirection: isRTL ? "row-reverse" : "row" }]}
           onPress={() => setTab("auction")}
           scaleDown={0.92}
         >
-          <Ionicons name="hammer-outline" size={15} color={tab === "auction" ? Colors.navy : Colors.textMuted} />
-          <Text style={[styles.switchTabText, tab === "auction" && { color: Colors.navy }]}>{t("market", "auctionSector")}</Text>
+          <Ionicons name="hammer-outline" size={15} color={tab === "auction" ? Colors.violet : Colors.textMuted} />
+          <Text style={[styles.switchTabText, tab === "auction" && { color: Colors.violet }]}>{t("market", "auctionSector")}</Text>
         </AnimatedPress>
         <AnimatedPress
           style={[styles.switchTab, tab === "family" && styles.switchTabActive, { flexDirection: isRTL ? "row-reverse" : "row" }]}
@@ -741,7 +741,7 @@ export default function MarketScreen() {
       >
         {(tab === "family" ? FAMILY_CATS : AUCTION_CATS).map((c) => {
           const active = (tab === "family" ? familyCat : auctionCat) === c.key;
-          const activeColor = tab === "family" ? Colors.primary : Colors.navy;
+          const activeColor = tab === "family" ? Colors.primary : Colors.violet;
           return (
             <AnimatedPress
               key={c.key}

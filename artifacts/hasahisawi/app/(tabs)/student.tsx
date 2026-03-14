@@ -14,7 +14,9 @@ import AnimatedPress from "@/components/AnimatedPress";
 import Colors from "@/constants/colors";
 
 // ─── Keys ────────────────────────────────────────────────────────────────────
-const INST_KEY       = "edu_institutions_v2";
+export const SCHOOLS_KEY = "edu_institutions_v2";
+export const INSTITUTIONS_KEY = SCHOOLS_KEY;
+const INST_KEY       = SCHOOLS_KEY;
 const INST_INIT_KEY  = "edu_institutions_initialized_v2";
 const REQ_KEY        = "edu_join_requests_v1";
 const ADMIN_KEY      = "admin_logged_in";
@@ -178,8 +180,20 @@ const SEED_INSTITUTIONS: Institution[] = [
   },
 ];
 
+// ─── Public Type Alias ───────────────────────────────────────────────────────
+export type School = Institution;
+
+// ─── Public Helpers ───────────────────────────────────────────────────────────
+export function getInstitutionTypeLabel(type: InstType, _t?: unknown): string { return INST_LABELS[type] ?? type; }
+export function getInstitutionTypeIcon(type: InstType, _t?: unknown): string  { return INST_ICONS[type] ?? "grid-outline"; }
+export function getInstitutionTypeColor(type: InstType, _t?: unknown): string { return INST_COLORS[type] ?? Colors.primary; }
+export const getSchoolTypeLabel = getInstitutionTypeLabel;
+export const getSchoolTypeIcon  = getInstitutionTypeIcon;
+export const getSchoolTypeColor = getInstitutionTypeColor;
+export async function loadSchools(): Promise<Institution[]> { return loadInstitutions(); }
+
 // ─── Storage Helpers ─────────────────────────────────────────────────────────
-async function loadInstitutions(): Promise<Institution[]> {
+export async function loadInstitutions(): Promise<Institution[]> {
   const init = await AsyncStorage.getItem(INST_INIT_KEY);
   if (!init) {
     await AsyncStorage.setItem(INST_KEY, JSON.stringify(SEED_INSTITUTIONS));
