@@ -6,6 +6,7 @@ import {
   Cairo_700Bold,
   useFonts,
 } from "@expo-google-fonts/cairo";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -23,7 +24,7 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back", headerShown: false }}>
+    <Stack screenOptions={{ headerBackTitle: "رجوع", headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="report" options={{ headerShown: false }} />
     </Stack>
@@ -36,6 +37,8 @@ export default function RootLayout() {
     Cairo_500Medium,
     Cairo_600SemiBold,
     Cairo_700Bold,
+    ...MaterialCommunityIcons.font,
+    ...Ionicons.font,
   });
   const [initialLang, setInitialLang] = useState<Lang | null>(null);
 
