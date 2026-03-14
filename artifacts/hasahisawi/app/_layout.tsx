@@ -17,6 +17,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
 import { AuthProvider } from "@/lib/auth-context";
 import { LangProvider, getStoredLang } from "@/lib/lang-context";
+import { FirebaseProvider } from "@/lib/firebase/context";
 import { I18nManager, Platform, View } from "react-native";
 import type { Lang } from "@/lib/translations";
 
@@ -64,15 +65,17 @@ export default function RootLayout() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <LangProvider initialLang={initialLang}>
-          <AuthProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <KeyboardProvider>
-                <View style={{ flex: 1, direction: Platform.OS === "web" ? (initialLang === "ar" ? "rtl" : "ltr") : undefined }}>
-                  <RootLayoutNav />
-                </View>
-              </KeyboardProvider>
-            </GestureHandlerRootView>
-          </AuthProvider>
+          <FirebaseProvider>
+            <AuthProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <KeyboardProvider>
+                  <View style={{ flex: 1, direction: Platform.OS === "web" ? (initialLang === "ar" ? "rtl" : "ltr") : undefined }}>
+                    <RootLayoutNav />
+                  </View>
+                </KeyboardProvider>
+              </GestureHandlerRootView>
+            </AuthProvider>
+          </FirebaseProvider>
         </LangProvider>
       </QueryClientProvider>
     </ErrorBoundary>
