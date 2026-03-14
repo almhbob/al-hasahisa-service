@@ -297,6 +297,88 @@ export default function HomeScreen() {
           </AnimatedPress>
         </View>
 
+        {/* ── بطاقة المطور ── */}
+        <Animated.View entering={FadeInDown.delay(400).springify().damping(20)} style={styles.devCardOuter}>
+          {/* إطار متوهج */}
+          <LinearGradient
+            colors={[Colors.accent + "90", Colors.primary + "70", Colors.cyber + "60", Colors.violet + "70", Colors.accent + "90"]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={styles.devCardBorder}
+          >
+            <LinearGradient
+              colors={["#060F1E", "#0A1628", "#060F1E"]}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={styles.devCardInner}
+            >
+              {/* شعاع ضوء خلفي */}
+              <View style={styles.devGlowTop} />
+              <View style={styles.devGlowBottom} />
+
+              {/* رأس البطاقة */}
+              <View style={styles.devCardTop}>
+                <View style={styles.devBadge}>
+                  <Text style={styles.devBadgeText}>DEVELOPER</Text>
+                </View>
+                <LinearGradient
+                  colors={[Colors.accent + "30", Colors.primary + "20"]}
+                  style={styles.devAppLabel}
+                >
+                  <Text style={styles.devAppLabelText}>حصاحيصاوي v1.0</Text>
+                </LinearGradient>
+              </View>
+
+              {/* الهوية */}
+              <View style={styles.devIdentity}>
+                {/* أفاتار */}
+                <LinearGradient
+                  colors={[Colors.accent, Colors.primary]}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  style={styles.devAvatar}
+                >
+                  <Text style={styles.devAvatarText}>م</Text>
+                </LinearGradient>
+
+                <View style={styles.devInfo}>
+                  <Text style={styles.devName}>محمد البوب</Text>
+                  <Text style={styles.devRole}>مطوّر تطبيقات الجوال</Text>
+                  <View style={styles.devContactRow}>
+                    <Ionicons name="logo-github" size={12} color={Colors.textMuted} />
+                    <Text style={styles.devContact}>almhbob2026</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* فاصل متوهج */}
+              <LinearGradient
+                colors={["transparent", Colors.accent + "60", Colors.primary + "60", "transparent"]}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={styles.devDivider}
+              />
+
+              {/* شارات التقنيات */}
+              <View style={styles.devTechRow}>
+                {[
+                  { label: "React Native", color: Colors.cyber },
+                  { label: "Expo",         color: "#6366F1" },
+                  { label: "TypeScript",   color: "#3B82F6" },
+                  { label: "Node.js",      color: Colors.primary },
+                ].map(tech => (
+                  <View key={tech.label} style={[styles.devTechBadge, { borderColor: tech.color + "50", backgroundColor: tech.color + "12" }]}>
+                    <View style={[styles.devTechDot, { backgroundColor: tech.color }]} />
+                    <Text style={[styles.devTechText, { color: tech.color }]}>{tech.label}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* حقوق */}
+              <Text style={styles.devCopyright}>
+                © 2026 · صُنع بـ ❤️ في حصاحيصا · السودان
+              </Text>
+            </LinearGradient>
+          </LinearGradient>
+        </Animated.View>
+
+        <View style={{ height: 40 }} />
       </View>
 
       <AuthModal visible={showAuth} onClose={() => setShowAuth(false)} />
@@ -496,5 +578,103 @@ const styles = StyleSheet.create({
   actionText: {
     fontFamily: "Cairo_600SemiBold", fontSize: 15,
     color: Colors.textPrimary, flex: 1,
+  },
+
+  /* ── Developer Card ── */
+  devCardOuter: {
+    marginTop: 32, marginHorizontal: 4,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    elevation: 20,
+  },
+  devCardBorder: {
+    borderRadius: 24,
+    padding: 1.5,
+  },
+  devCardInner: {
+    borderRadius: 23,
+    padding: 20,
+    overflow: "hidden",
+  },
+  devGlowTop: {
+    position: "absolute", top: -40, left: "20%",
+    width: 160, height: 160, borderRadius: 80,
+    backgroundColor: Colors.accent + "10",
+  },
+  devGlowBottom: {
+    position: "absolute", bottom: -40, right: "10%",
+    width: 120, height: 120, borderRadius: 60,
+    backgroundColor: Colors.cyber + "10",
+  },
+  devCardTop: {
+    flexDirection: "row", justifyContent: "space-between",
+    alignItems: "center", marginBottom: 18,
+  },
+  devBadge: {
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8,
+    backgroundColor: Colors.accent + "20",
+    borderWidth: 1, borderColor: Colors.accent + "50",
+  },
+  devBadgeText: {
+    fontFamily: "Cairo_700Bold", fontSize: 10,
+    color: Colors.accent, letterSpacing: 2,
+  },
+  devAppLabel: {
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 10,
+  },
+  devAppLabelText: {
+    fontFamily: "Cairo_600SemiBold", fontSize: 11, color: Colors.primary,
+  },
+  devIdentity: {
+    flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 18,
+  },
+  devAvatar: {
+    width: 58, height: 58, borderRadius: 18,
+    justifyContent: "center", alignItems: "center",
+    shadowColor: Colors.accent, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8, shadowRadius: 12, elevation: 10,
+  },
+  devAvatarText: {
+    fontFamily: "Cairo_700Bold", fontSize: 26, color: "#000",
+  },
+  devInfo: { flex: 1, gap: 3 },
+  devName: {
+    fontFamily: "Cairo_700Bold", fontSize: 18,
+    color: Colors.textPrimary,
+    textShadowColor: Colors.accent + "60",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  devRole: {
+    fontFamily: "Cairo_400Regular", fontSize: 13, color: Colors.textSecondary,
+  },
+  devContactRow: {
+    flexDirection: "row", alignItems: "center", gap: 5, marginTop: 2,
+  },
+  devContact: {
+    fontFamily: "Cairo_400Regular", fontSize: 12, color: Colors.textMuted,
+  },
+  devDivider: {
+    height: 1, borderRadius: 1, marginBottom: 14,
+  },
+  devTechRow: {
+    flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16,
+  },
+  devTechBadge: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10,
+    borderWidth: 1,
+  },
+  devTechDot: {
+    width: 6, height: 6, borderRadius: 3,
+  },
+  devTechText: {
+    fontFamily: "Cairo_400Regular", fontSize: 11,
+  },
+  devCopyright: {
+    fontFamily: "Cairo_400Regular", fontSize: 11,
+    color: Colors.textMuted, textAlign: "center", marginTop: 2,
   },
 });
