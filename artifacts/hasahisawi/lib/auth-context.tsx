@@ -8,7 +8,7 @@ export type AuthUser = {
   national_id_masked?: string | null;
   phone?: string | null;
   email?: string | null;
-  role: "user" | "admin" | "moderator";
+  role: "user" | "admin" | "moderator" | "guest";
   permissions?: string[];
 };
 
@@ -16,10 +16,13 @@ type AuthContextValue = {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  isGuest: boolean;
+  canPost: boolean;
   login: (phoneOrEmail: string, password: string) => Promise<void>;
   loginAdmin: (email: string, password: string) => Promise<void>;
   register: (name: string, nationalId: string, phoneOrEmail: string, isEmail: boolean, password: string) => Promise<void>;
   registerAdmin: (name: string, email: string, password: string, adminCode: string) => Promise<void>;
+  enterAsGuest: () => void;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 };
