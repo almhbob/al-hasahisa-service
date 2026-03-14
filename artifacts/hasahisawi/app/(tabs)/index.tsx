@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Dimensions,
   Image,
+  Linking,
 } from "react-native";
 import Animated, {
   FadeInDown, FadeIn, FadeInUp, FadeInRight,
@@ -329,22 +330,22 @@ export default function HomeScreen() {
 
               {/* الهوية */}
               <View style={styles.devIdentity}>
-                {/* أفاتار */}
                 <LinearGradient
                   colors={[Colors.accent, Colors.primary]}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                   style={styles.devAvatar}
                 >
-                  <Text style={styles.devAvatarText}>م</Text>
+                  <Text style={styles.devAvatarText}>ع</Text>
                 </LinearGradient>
 
                 <View style={styles.devInfo}>
-                  <Text style={styles.devName}>محمد البوب</Text>
-                  <Text style={styles.devRole}>مطوّر تطبيقات الجوال</Text>
+                  <Text style={styles.devName}>عاصم عبدالرحمن محمد</Text>
+                  <Text style={styles.devRole}>مطوّر تطبيقات · محلل بيانات</Text>
                   <View style={styles.devContactRow}>
-                    <Ionicons name="logo-github" size={12} color={Colors.textMuted} />
-                    <Text style={styles.devContact}>almhbob2026</Text>
+                    <Ionicons name="location-outline" size={12} color={Colors.primary} />
+                    <Text style={[styles.devContact, { color: Colors.primary }]}>حصاحيصا · ولاية الجزيرة · السودان</Text>
                   </View>
+                  <Text style={styles.devBirth}>م. 2 مايو 1991</Text>
                 </View>
               </View>
 
@@ -352,16 +353,46 @@ export default function HomeScreen() {
               <LinearGradient
                 colors={["transparent", Colors.accent + "60", Colors.primary + "60", "transparent"]}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={styles.devDivider}
+                style={[styles.devDivider, { marginBottom: 16 }]}
               />
 
-              {/* شارات التقنيات */}
+              {/* وسائل التواصل */}
+              {[
+                { icon: "logo-whatsapp",  color: "#25D366", label: "+966 530 658 285",              url: "https://wa.me/966530658285" },
+                { icon: "logo-whatsapp",  color: "#25D366", label: "+249 916 897 578",              url: "https://wa.me/249916897578" },
+                { icon: "logo-linkedin",  color: "#0A66C2", label: "linkedin.com/in/asim-abdulrahman", url: "https://www.linkedin.com/in/asim-abdulrahman" },
+                { icon: "logo-facebook",  color: "#1877F2", label: "facebook.com/almhbob2013",     url: "https://www.facebook.com/almhbob2013" },
+                { icon: "mail-outline",   color: Colors.cyber, label: "almhbob.iii@gmail.com",    url: "mailto:almhbob.iii@gmail.com" },
+              ].map((item) => (
+                <AnimatedPress key={item.url} onPress={() => Linking.openURL(item.url)}>
+                  <View style={styles.devSocialRow}>
+                    <View style={[styles.devSocialIcon, { backgroundColor: item.color + "18", borderColor: item.color + "40" }]}>
+                      <Ionicons name={item.icon as any} size={15} color={item.color} />
+                    </View>
+                    <Text style={[styles.devSocialLabel, { color: item.color }]}>{item.label}</Text>
+                    <Ionicons name="chevron-forward" size={13} color={item.color + "60"} />
+                  </View>
+                </AnimatedPress>
+              ))}
+
+              {/* فاصل متوهج */}
+              <LinearGradient
+                colors={["transparent", Colors.violet + "50", Colors.cyber + "50", "transparent"]}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={[styles.devDivider, { marginTop: 14, marginBottom: 14 }]}
+              />
+
+              {/* الشهادات والتقنيات */}
+              <Text style={styles.devSectionTitle}>الشهادات والمهارات</Text>
               <View style={styles.devTechRow}>
                 {[
-                  { label: "React Native", color: Colors.cyber },
-                  { label: "Expo",         color: "#6366F1" },
-                  { label: "TypeScript",   color: "#3B82F6" },
-                  { label: "Node.js",      color: Colors.primary },
+                  { label: "React Native",    color: Colors.cyber },
+                  { label: "Data Analytics",  color: Colors.accent },
+                  { label: "Cybersecurity",   color: Colors.danger },
+                  { label: "Cloud DevOps",    color: "#6366F1" },
+                  { label: "Data Science",    color: "#3B82F6" },
+                  { label: "TypeScript",      color: "#60A5FA" },
+                  { label: "Node.js",         color: Colors.primary },
                 ].map(tech => (
                   <View key={tech.label} style={[styles.devTechBadge, { borderColor: tech.color + "50", backgroundColor: tech.color + "12" }]}>
                     <View style={[styles.devTechDot, { backgroundColor: tech.color }]} />
@@ -369,6 +400,22 @@ export default function HomeScreen() {
                   </View>
                 ))}
               </View>
+
+              {/* شارة Credly */}
+              <AnimatedPress onPress={() => Linking.openURL("https://www.credly.com/users/asim-abdulrahman")}>
+                <LinearGradient
+                  colors={[Colors.accent + "15", Colors.primary + "10"]}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={styles.devCredlyRow}
+                >
+                  <Ionicons name="ribbon-outline" size={16} color={Colors.accent} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.devCredlyTitle}>الشهادات المعتمدة · Credly</Text>
+                    <Text style={styles.devCredlyText}>Google · IBM · Cisco · Intel · Fortinet</Text>
+                  </View>
+                  <Ionicons name="open-outline" size={14} color={Colors.accent + "80"} />
+                </LinearGradient>
+              </AnimatedPress>
 
               {/* حقوق */}
               <Text style={styles.devCopyright}>
@@ -672,6 +719,36 @@ const styles = StyleSheet.create({
   },
   devTechText: {
     fontFamily: "Cairo_400Regular", fontSize: 11,
+  },
+  devBirth: {
+    fontFamily: "Cairo_400Regular", fontSize: 11, color: Colors.textMuted, marginTop: 2,
+  },
+  devSocialRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingVertical: 8, paddingHorizontal: 4,
+  },
+  devSocialIcon: {
+    width: 32, height: 32, borderRadius: 10,
+    justifyContent: "center", alignItems: "center",
+    borderWidth: 1,
+  },
+  devSocialLabel: {
+    fontFamily: "Cairo_400Regular", fontSize: 13, flex: 1,
+  },
+  devSectionTitle: {
+    fontFamily: "Cairo_600SemiBold", fontSize: 12,
+    color: Colors.textMuted, marginBottom: 10, letterSpacing: 0.5,
+  },
+  devCredlyRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    borderRadius: 12, padding: 12, marginTop: 12, marginBottom: 14,
+    borderWidth: 1, borderColor: Colors.accent + "30",
+  },
+  devCredlyTitle: {
+    fontFamily: "Cairo_600SemiBold", fontSize: 12, color: Colors.accent,
+  },
+  devCredlyText: {
+    fontFamily: "Cairo_400Regular", fontSize: 11, color: Colors.textMuted, marginTop: 1,
   },
   devCopyright: {
     fontFamily: "Cairo_400Regular", fontSize: 11,
