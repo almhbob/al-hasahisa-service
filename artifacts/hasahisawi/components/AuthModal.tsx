@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   View, Text, StyleSheet, Modal, TouchableOpacity, TextInput,
-  Pressable, ScrollView, Platform, ActivityIndicator,
+  Pressable, ScrollView, Platform, ActivityIndicator, Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -94,16 +94,46 @@ export default function AuthModal({ visible, onClose }: { visible: boolean; onCl
           {/* Handle */}
           <View style={s.handle} />
 
-          {/* Header */}
-          <View style={[s.header, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
-            <TouchableOpacity onPress={handleClose} hitSlop={14}>
-              <Ionicons name="close" size={22} color={Colors.textSecondary} />
-            </TouchableOpacity>
-            <Text style={s.headerTitle}>
-              {mode === "login" ? "تسجيل الدخول" : "إنشاء حساب جديد"}
-            </Text>
-            <View style={{ width: 22 }} />
-          </View>
+          {/* زر الإغلاق */}
+          <TouchableOpacity onPress={handleClose} hitSlop={14} style={s.closeBtn}>
+            <Ionicons name="close" size={22} color={Colors.textSecondary} />
+          </TouchableOpacity>
+
+          {/* Header — شعار + عنوان مستقبلي */}
+          <LinearGradient
+            colors={[Colors.primary + "18", Colors.accent + "10", "transparent"]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={s.heroBanner}
+          >
+            {/* توهجات خلفية */}
+            <View style={s.glowLeft} />
+            <View style={s.glowRight} />
+
+            <View style={s.logoRow}>
+              <View style={s.logoWrap}>
+                <Image
+                  source={require("@/assets/images/logo.png")}
+                  style={s.logo}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={{ alignItems: "center", flex: 1 }}>
+                <Text style={s.appName}>حصاحيصاوي</Text>
+                <Text style={s.appTagline}>بوابتك الذكية لمدينة الحصاحيصا</Text>
+              </View>
+            </View>
+
+            {/* شريط الوضع */}
+            <View style={[s.modeChip, { backgroundColor: Colors.primary + "20", borderColor: Colors.primary + "40" }]}>
+              <Ionicons
+                name={mode === "login" ? "log-in-outline" : "person-add-outline"}
+                size={14} color={Colors.primary}
+              />
+              <Text style={s.modeChipText}>
+                {mode === "login" ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+              </Text>
+            </View>
+          </LinearGradient>
 
           {/* Mode toggle */}
           <View style={[s.toggleRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
@@ -265,17 +295,29 @@ export default function AuthModal({ visible, onClose }: { visible: boolean; onCl
 
               {/* زر الإرسال */}
               <TouchableOpacity
-                style={[s.submitBtn, loading && { opacity: 0.7 }]}
                 onPress={handleSubmit}
                 disabled={loading}
                 activeOpacity={0.85}
+                style={loading ? { opacity: 0.7 } : undefined}
               >
-                {loading
-                  ? <ActivityIndicator color="#fff" size="small" />
-                  : <Text style={s.submitBtnText}>
-                    {mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب"}
-                  </Text>
-                }
+                <LinearGradient
+                  colors={[Colors.primary, Colors.primaryDim]}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={s.submitBtn}
+                >
+                  {loading
+                    ? <ActivityIndicator color="#000" size="small" />
+                    : <>
+                        <Ionicons
+                          name={mode === "login" ? "log-in-outline" : "person-add-outline"}
+                          size={18} color="#000"
+                        />
+                        <Text style={s.submitBtnText}>
+                          {mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب"}
+                        </Text>
+                      </>
+                  }
+                </LinearGradient>
               </TouchableOpacity>
 
               {/* فاصل */}
@@ -305,24 +347,68 @@ export default function AuthModal({ visible, onClose }: { visible: boolean; onCl
 
 const s = StyleSheet.create({
   overlay: {
-    flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "flex-end",
+    flex: 1, backgroundColor: "rgba(0,0,0,0.72)", justifyContent: "flex-end",
   },
   sheet: {
     backgroundColor: Colors.cardBg,
-    borderTopLeftRadius: 28, borderTopRightRadius: 28,
-    maxHeight: "92%",
+    borderTopLeftRadius: 32, borderTopRightRadius: 32,
+    maxHeight: "94%",
+    borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1,
+    borderColor: Colors.primary + "30",
   },
   handle: {
-    width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.divider,
+    width: 44, height: 4, borderRadius: 2, backgroundColor: Colors.primary + "40",
     alignSelf: "center", marginTop: 12, marginBottom: 4,
   },
-  header: {
-    alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingVertical: 14,
-    borderBottomWidth: 1, borderBottomColor: Colors.divider,
+  closeBtn: {
+    position: "absolute", top: 18, left: 20, zIndex: 10,
+    width: 34, height: 34, borderRadius: 10,
+    backgroundColor: Colors.bg, borderWidth: 1, borderColor: Colors.divider,
+    justifyContent: "center", alignItems: "center",
   },
-  headerTitle: {
-    fontFamily: "Cairo_700Bold", fontSize: 18, color: Colors.textPrimary,
+
+  /* Hero Banner */
+  heroBanner: {
+    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20,
+    marginBottom: 4, overflow: "hidden",
+  },
+  glowLeft: {
+    position: "absolute", left: -30, top: 0,
+    width: 100, height: 100, borderRadius: 50,
+    backgroundColor: Colors.primary, opacity: 0.08,
+  },
+  glowRight: {
+    position: "absolute", right: -30, top: 0,
+    width: 80, height: 80, borderRadius: 40,
+    backgroundColor: Colors.accent, opacity: 0.1,
+  },
+  logoRow: {
+    flexDirection: "row", alignItems: "center", marginBottom: 14,
+    paddingLeft: 40,
+  },
+  logoWrap: {
+    width: 60, height: 60, borderRadius: 18,
+    backgroundColor: "#FFFFFF", overflow: "hidden",
+    borderWidth: 2, borderColor: Colors.primary + "60",
+    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5, shadowRadius: 12, elevation: 8,
+    marginRight: 14,
+  },
+  logo: { width: "100%", height: "100%" },
+  appName: {
+    fontFamily: "Cairo_700Bold", fontSize: 20, color: Colors.textPrimary,
+    textShadowColor: Colors.primary + "60", textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8,
+  },
+  appTagline: {
+    fontFamily: "Cairo_400Regular", fontSize: 11, color: Colors.textSecondary, marginTop: 2,
+  },
+  modeChip: {
+    flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "center",
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6,
+    borderWidth: 1,
+  },
+  modeChipText: {
+    fontFamily: "Cairo_600SemiBold", fontSize: 13, color: Colors.primary,
   },
 
   /* Toggle */
@@ -392,10 +478,13 @@ const s = StyleSheet.create({
 
   /* Submit */
   submitBtn: {
-    backgroundColor: Colors.primary, borderRadius: 14, paddingVertical: 15,
+    borderRadius: 16, paddingVertical: 15,
     alignItems: "center", marginTop: 4,
+    flexDirection: "row", justifyContent: "center", gap: 8,
+    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4, shadowRadius: 12, elevation: 8,
   },
-  submitBtnText: { fontFamily: "Cairo_700Bold", fontSize: 16, color: "#fff" },
+  submitBtnText: { fontFamily: "Cairo_700Bold", fontSize: 16, color: "#000" },
 
   /* Divider */
   dividerRow: {

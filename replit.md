@@ -94,3 +94,27 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### `artifacts/hasahisawi` (`@workspace/hasahisawi`)
+
+Expo React Native mobile app — "حصاحيصاوي" community services platform for Hasahisa city, Sudan.
+
+**Config**: Bundle ID `com.almhbob.hasahisawi` | EAS Project `al-hasahisa-service` | Owner `almhbob2026` | Project ID `0d3b27d0-5d06-49dd-9b21-be26fb7a5a1a`
+
+**Color Palette** (futuristic, extracted from logo):
+- Primary: `#00D68F` (neon emerald — from green logo figure)
+- Accent: `#FFD000` (cyber gold — from yellow logo figure)
+- Cyber: `#00CFFF` (neon blue)
+- Bg: `#040D18` (deep space)
+- CardBg: `#0A1628`
+
+**Key files**:
+- `app/(tabs)/index.tsx` — Home screen with futuristic hero + logo
+- `app/(tabs)/_layout.tsx` — Tab navigation
+- `components/AuthModal.tsx` — Auth modal with logo header
+- `constants/colors.ts` — Futuristic color system
+- `lib/auth-context.tsx` — Auth + guest mode
+- `lib/translations.ts` — Arabic/English translations
+
+**Auth**: Backend uses raw `pg` Pool (NOT Drizzle), bcryptjs; admin PIN "4444"
+**EAS Build**: Free plan quota resets April 1 2026. Keystore: JPZivGaYVY. Run `EAS_NO_VCS=1 npx eas-cli build --platform android --profile production --non-interactive --no-wait` from `artifacts/hasahisawi/`
