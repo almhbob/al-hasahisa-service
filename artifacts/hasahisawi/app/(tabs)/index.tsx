@@ -353,7 +353,28 @@ export default function HomeScreen() {
               <LinearGradient
                 colors={["transparent", Colors.accent + "60", Colors.primary + "60", "transparent"]}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={[styles.devDivider, { marginBottom: 16 }]}
+                style={[styles.devDivider, { marginBottom: 14 }]}
+              />
+
+              {/* نبذة تعريفية */}
+              <View style={styles.devBioBox}>
+                <View style={styles.devBioHeader}>
+                  <Ionicons name="person-circle-outline" size={15} color={Colors.accent} />
+                  <Text style={styles.devBioTitle}>نبذة تعريفية</Text>
+                </View>
+                <Text style={styles.devBioText}>
+                  مطوّر تطبيقات جوّال ومحلّل بيانات من مدينة حصاحيصا، ولاية الجزيرة، السودان.
+                  {"\n\n"}
+                  يمتلك خبرةً متخصصة في بناء تطبيقات React Native وTypeScript، وتحليل البيانات، والأمن السيبراني. صاحب شغف حقيقي بالتقنية وتوظيفها لخدمة المجتمع وتيسير حياة أبناء مدينته.
+                  {"\n\n"}
+                  حاصل على شهادات دولية معتمدة من Google وIBM وCisco وIntel وFortinet، ويؤمن بأن التكنولوجيا جسرٌ نحو تنمية الأوطان.
+                </Text>
+              </View>
+
+              <LinearGradient
+                colors={["transparent", Colors.primary + "30", "transparent"]}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={[styles.devDivider, { marginBottom: 14 }]}
               />
 
               {/* وسائل التواصل */}
@@ -705,6 +726,34 @@ const styles = StyleSheet.create({
   },
   devDivider: {
     height: 1, borderRadius: 1, marginBottom: 14,
+  },
+  devBioBox: {
+    backgroundColor: Colors.cardBgElevated,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: Colors.accent + "25",
+  },
+  devBioHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 10,
+  },
+  devBioTitle: {
+    fontFamily: "Cairo_600SemiBold",
+    fontSize: 13,
+    color: Colors.accent,
+    letterSpacing: 0.3,
+  },
+  devBioText: {
+    fontFamily: "Cairo_400Regular",
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 22,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   devTechRow: {
     flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16,
