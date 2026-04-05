@@ -5,13 +5,15 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+import { fsGetCollection, fsAddDoc, fsUpdateDoc, COLLECTIONS, orderBy, where, isFirebaseAvailable } from "@/lib/firebase/firestore";
 import Animated, { FadeInDown, FadeInUp, FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect } from "expo-router";
 import Colors from "@/constants/colors";
 import AnimatedPress from "@/components/AnimatedPress";
+import GuestGate from "@/components/GuestGate";
+import { useAuth } from "@/lib/auth-context";
 
 // ══════════════════════════════════════════════════════════
 // TYPES
@@ -57,7 +59,7 @@ const FACILITIES: BookingFacility[] = [
     id: "f1", name: "مستشفى حصاحيصا الحكومي",
     category: "health", subcategory: "مستشفى",
     address: "المنطقة المركزية، حصاحيصا", phone: "+249912345682",
-    icon: "hospital-building", color: "#00CFFF",
+    icon: "hospital-building", color: "#3E9CBF",
     services: ["طوارئ", "جراحة عامة", "أطفال", "نساء وتوليد", "باطنية", "أشعة وتحاليل"],
     workDays: "السبت - الخميس", hours: "24 ساعة",
   },
@@ -65,7 +67,7 @@ const FACILITIES: BookingFacility[] = [
     id: "f2", name: "مستشفى الخيرية الأهلي",
     category: "health", subcategory: "مستشفى",
     address: "حي السلام، حصاحيصا", phone: "+249912345683",
-    icon: "hospital-building", color: "#00CFFF",
+    icon: "hospital-building", color: "#3E9CBF",
     services: ["باطنية", "أطفال", "تحاليل مخبرية", "مراجعة عامة"],
     workDays: "السبت - الخميس", hours: "7ص - 5م",
   },
@@ -89,7 +91,7 @@ const FACILITIES: BookingFacility[] = [
     id: "f5", name: "مركز صحة الأسرة",
     category: "health", subcategory: "مركز صحي",
     address: "حي الضحى، حصاحيصا", phone: "+249912345686",
-    icon: "heart-pulse", color: "#00D68F",
+    icon: "heart-pulse", color: "#27AE68",
     services: ["رعاية الأم والطفل", "تخطيط الأسرة", "تطعيمات", "صحة المدرسة"],
     workDays: "السبت - الخميس", hours: "8ص - 2م",
   },
@@ -98,7 +100,7 @@ const FACILITIES: BookingFacility[] = [
     id: "g1", name: "محلية حصاحيصا",
     category: "government", subcategory: "محلية",
     address: "مقر المحلية، حصاحيصا", phone: "+249912345690",
-    icon: "office-building", color: "#FFD000",
+    icon: "office-building", color: "#F0A500",
     services: ["تسجيل عقارات", "رخص تشغيل", "شهادات إقامة", "تسجيل مواليد", "دفن الموتى", "خدمات عامة"],
     workDays: "السبت - الخميس", hours: "8ص - 2م",
   },
@@ -106,7 +108,7 @@ const FACILITIES: BookingFacility[] = [
     id: "g2", name: "سجل مدني - حصاحيصا",
     category: "government", subcategory: "سجل مدني",
     address: "مبنى السجل المدني، حصاحيصا", phone: "+249912345691",
-    icon: "card-account-details", color: "#FFD000",
+    icon: "card-account-details", color: "#F0A500",
     services: ["استخراج بطاقة شخصية", "تجديد بطاقة", "شهادة ميلاد", "شهادة زواج", "شهادة وفاة"],
     workDays: "السبت - الخميس", hours: "8ص - 2م",
   },
@@ -130,7 +132,7 @@ const FACILITIES: BookingFacility[] = [
     id: "g5", name: "مكتب الشؤون الاجتماعية",
     category: "government", subcategory: "اجتماعي",
     address: "مجمع الخدمات، حصاحيصا", phone: "+249912345694",
-    icon: "account-group", color: "#00D68F",
+    icon: "account-group", color: "#27AE68",
     services: ["طلب إعانة", "تسجيل أسرة", "شهادة عوز", "خدمات ذوي الإعاقة"],
     workDays: "السبت - الخميس", hours: "8ص - 2م",
   },
@@ -145,7 +147,7 @@ const TIME_SLOTS = [
 
 const DAYS = ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
-const APPTS_KEY = "appointments_v2";
+const APPTS_KEY = "appointments_v2_legacy";
 
 function getNextDates(): { label: string; value: string }[] {
   const dates: { label: string; value: string }[] = [];
@@ -175,6 +177,7 @@ const STATUS_LABELS: Record<AppStatus, { label: string; color: string; icon: str
 type Step = "category" | "facility" | "service" | "datetime" | "info" | "confirm";
 
 export default function AppointmentsScreen() {
+  const { isGuest, user } = useAuth();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
@@ -197,8 +200,15 @@ export default function AppointmentsScreen() {
   const [apptFilter, setApptFilter] = useState<AppStatus | "all">("all");
 
   const loadAppointments = async () => {
-    const raw = await AsyncStorage.getItem(APPTS_KEY);
-    setAppointments(raw ? JSON.parse(raw) : []);
+    if (!user?.uid || !isFirebaseAvailable()) { setAppointments([]); return; }
+    try {
+      const docs = await fsGetCollection<Appointment>(
+        COLLECTIONS.APPOINTMENTS,
+        where("userId", "==", user.uid),
+        orderBy("createdAt", "desc"),
+      );
+      setAppointments(docs);
+    } catch { setAppointments([]); }
   };
 
   useEffect(() => { loadAppointments(); }, []);
@@ -216,24 +226,24 @@ export default function AppointmentsScreen() {
 
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    const newAppt: Appointment = {
-      id: Date.now().toString(),
-      facilityId: facility!.id,
-      facilityName: facility!.name,
-      facilityCategory: facility!.category,
-      service, patientName: patientName.trim(),
-      phone: phone.trim(), date, time, notes: notes.trim(),
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    };
-    const existing = await AsyncStorage.getItem(APPTS_KEY);
-    const all: Appointment[] = existing ? JSON.parse(existing) : [];
-    all.unshift(newAppt);
-    await AsyncStorage.setItem(APPTS_KEY, JSON.stringify(all));
-    setAppointments(all);
-    resetBooking();
-    setTab("my");
-    Alert.alert("✅ تم الحجز!", `تم إرسال طلب موعدك في ${facility!.name}\nيوم ${date} الساعة ${time}\nسيتم التواصل معك للتأكيد`);
+    try {
+      await fsAddDoc(COLLECTIONS.APPOINTMENTS, {
+        facilityId: facility!.id,
+        facilityName: facility!.name,
+        facilityCategory: facility!.category,
+        service, patientName: patientName.trim(),
+        phone: phone.trim(), date, time, notes: notes.trim(),
+        status: "pending",
+        userId: user?.uid ?? null,
+        createdAt: new Date().toISOString(),
+      });
+      await loadAppointments();
+      resetBooking();
+      setTab("my");
+      Alert.alert("✅ تم الحجز!", `تم إرسال طلب موعدك في ${facility!.name}\nيوم ${date} الساعة ${time}\nسيتم التواصل معك للتأكيد`);
+    } catch {
+      Alert.alert("خطأ", "تعذّر حفظ الموعد، تحقق من الاتصال");
+    }
   };
 
   const cancelAppointment = async (id: string) => {
@@ -241,9 +251,10 @@ export default function AppointmentsScreen() {
       { text: "لا", style: "cancel" },
       {
         text: "نعم، ألغِ", style: "destructive", onPress: async () => {
-          const updated = appointments.map(a => a.id === id ? { ...a, status: "cancelled" as AppStatus } : a);
-          setAppointments(updated);
-          await AsyncStorage.setItem(APPTS_KEY, JSON.stringify(updated));
+          try {
+            await fsUpdateDoc(COLLECTIONS.APPOINTMENTS, id, { status: "cancelled" });
+            setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: "cancelled" as AppStatus } : a));
+          } catch { Alert.alert("خطأ", "تعذّر الإلغاء"); }
         }
       }
     ]);
@@ -253,6 +264,20 @@ export default function AppointmentsScreen() {
 
   const healthFacilities = FACILITIES.filter(f => f.category === "health");
   const govFacilities = FACILITIES.filter(f => f.category === "government");
+
+  if (isGuest) {
+    return (
+      <GuestGate
+        title="حجز المواعيد للأعضاء فقط"
+        features={[
+          { icon: "calendar-outline",    text: "احجز مواعيد في المرافق الصحية" },
+          { icon: "business-outline",    text: "تعامل مع الدوائر الحكومية بسهولة" },
+          { icon: "notifications-outline", text: "تلقّ تذكيرات بمواعيدك" },
+          { icon: "list-outline",        text: "تابع حالة طلباتك ومواعيدك" },
+        ]}
+      />
+    );
+  }
 
   return (
     <View style={s.root}>
@@ -339,20 +364,20 @@ export default function AppointmentsScreen() {
 
               <AnimatedPress onPress={() => { setCategory("health"); setStep("facility"); }}>
                 <LinearGradient
-                  colors={["#00CFFF18", "#00CFFF08"]}
-                  style={[s.catCard, { borderColor: "#00CFFF40" }]}
+                  colors={["#3E9CBF18", "#3E9CBF08"]}
+                  style={[s.catCard, { borderColor: "#3E9CBF40" }]}
                 >
-                  <View style={[s.catIcon, { backgroundColor: "#00CFFF20" }]}>
-                    <MaterialCommunityIcons name="hospital-building" size={36} color="#00CFFF" />
+                  <View style={[s.catIcon, { backgroundColor: "#3E9CBF20" }]}>
+                    <MaterialCommunityIcons name="hospital-building" size={36} color="#3E9CBF" />
                   </View>
                   <View style={s.catInfo}>
                     <Text style={s.catTitle}>المرافق الصحية</Text>
                     <Text style={s.catSub}>مستشفيات · عيادات · مراكز صحية</Text>
                     <View style={s.catCount}>
-                      <Text style={[s.catCountText, { color: "#00CFFF" }]}>{healthFacilities.length} مرافق متاحة</Text>
+                      <Text style={[s.catCountText, { color: "#3E9CBF" }]}>{healthFacilities.length} مرافق متاحة</Text>
                     </View>
                   </View>
-                  <Ionicons name="chevron-forward" size={22} color="#00CFFF" />
+                  <Ionicons name="chevron-forward" size={22} color="#3E9CBF" />
                 </LinearGradient>
               </AnimatedPress>
 
