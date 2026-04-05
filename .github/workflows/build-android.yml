@@ -72,7 +72,7 @@ jobs:
           retention-days: 30
 
       - name: Upload to Google Play (Internal Track)
-        if: github.ref == 'refs/heads/main' && secrets.GOOGLE_PLAY_SERVICE_ACCOUNT != ''
+        if: github.ref == 'refs/heads/main'
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
