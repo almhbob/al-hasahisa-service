@@ -11,16 +11,22 @@ import {
   TextInput,
   ScrollView,
   Linking,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { useLang } from "@/lib/lang-context";
 import { useAuth } from "@/lib/auth-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import AnimatedPress from "@/components/AnimatedPress";
+import GuestGate from "@/components/GuestGate";
+import { requireNetwork } from "@/lib/network";
+import {
+  fsGetCollection, fsAddDoc, fsDeleteDoc,
+  COLLECTIONS, orderBy, isFirebaseAvailable,
+} from "@/lib/firebase/firestore";
 
 export type Job = {
   id: string;
@@ -34,7 +40,8 @@ export type Job = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "jobs_listings";
+// STORAGE_KEY kept for reference only — data now lives in Firestore
+const STORAGE_KEY = "jobs_listings_legacy";
 
 const SAMPLE_JOBS: Job[] = [
   {
@@ -169,6 +176,7 @@ function AddJobModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <View style={modalStyles.overlay}>
         <View style={[modalStyles.sheet, { paddingBottom: insets.bottom + 16 }]}>
           <View style={modalStyles.handle} />
@@ -226,6 +234,7 @@ function AddJobModal({
           </ScrollView>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -271,40 +280,44 @@ export default function JobsScreen() {
 
   const loadJobs = async () => {
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      const saved: Job[] = raw ? JSON.parse(raw) : [];
-      setJobs([...saved, ...SAMPLE_JOBS]);
+      if (isFirebaseAvailable()) {
+        const docs = await fsGetCollection<Job>(COLLECTIONS.JOBS, orderBy("createdAt", "desc"));
+        setJobs(docs.length > 0 ? docs : SAMPLE_JOBS);
+      } else {
+        setJobs(SAMPLE_JOBS);
+      }
     } catch {
       setJobs(SAMPLE_JOBS);
     }
   };
 
   const saveJob = async (jobData: Omit<Job, "id" | "createdAt">): Promise<void> => {
-    if (Platform.OS !== "web") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    try {
+      await fsAddDoc(COLLECTIONS.JOBS, {
+        ...jobData,
+        postedBy: auth.user?.uid ?? null,
+        createdAt: new Date().toISOString(),
+      });
+      await loadJobs();
+    } catch {
+      Alert.alert(t("common", "error"), "تعذّر حفظ الوظيفة، تحقق من الاتصال");
     }
-    const newJob: Job = {
-      ...jobData,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString(),
-    };
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    const existing: Job[] = raw ? JSON.parse(raw) : [];
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([newJob, ...existing]));
-    await loadJobs();
   };
 
   const deleteJob = (id: string) => {
+    const isSample = id.startsWith("sample");
+    if (isSample) return;
     Alert.alert(t("jobs", "deleteConfirm") || t("common", "confirm"), t("common", "deleteMessage"), [
       { text: t("common", "cancel"), style: "cancel" },
       {
         text: t("common", "delete"),
         style: "destructive",
         onPress: async () => {
-          const raw = await AsyncStorage.getItem(STORAGE_KEY);
-          const saved: Job[] = raw ? JSON.parse(raw) : [];
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(saved.filter((j) => j.id !== id)));
-          loadJobs();
+          try {
+            await fsDeleteDoc(COLLECTIONS.JOBS, id);
+            loadJobs();
+          } catch { Alert.alert(t("common", "error"), "تعذّر الحذف"); }
         },
       },
     ]);
@@ -344,6 +357,40 @@ export default function JobsScreen() {
         ))}
       </ScrollView>
 
+      <GuestGate
+        title={tr("فرص العمل", "Job Opportunities")}
+        preview={
+          <View style={{ padding: 16, gap: 12 }}>
+            {[
+              { title: "مدرّس لغة عربية", company: "مدرسة حصاحيصا الثانوية", type: "دوام كامل", loc: "حصاحيصا" },
+              { title: "محاسب قانوني", company: "شركة النيل التجارية", type: "دوام جزئي", loc: "حصاحيصا" },
+              { title: "مهندس زراعي", company: "مزرعة الخير", type: "عقد", loc: "الجزيرة" },
+            ].map((item, i) => (
+              <View key={i} style={{ backgroundColor: Colors.cardBg, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: Colors.divider }}>
+                <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <View style={{ flex: 1, alignItems: "flex-end" }}>
+                    <Text style={{ fontFamily: "Cairo_700Bold", fontSize: 15, color: Colors.textPrimary, textAlign: "right" }}>{item.title}</Text>
+                    <Text style={{ fontFamily: "Cairo_400Regular", fontSize: 12, color: Colors.textMuted, textAlign: "right", marginTop: 2 }}>{item.company}</Text>
+                  </View>
+                  <View style={{ backgroundColor: Colors.primary + "20", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, marginRight: 10 }}>
+                    <Text style={{ fontFamily: "Cairo_500Medium", fontSize: 11, color: Colors.primary }}>{item.type}</Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4, marginTop: 8 }}>
+                  <Ionicons name="location-outline" size={12} color={Colors.textMuted} />
+                  <Text style={{ fontFamily: "Cairo_400Regular", fontSize: 12, color: Colors.textMuted }}>{item.loc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        }
+        features={[
+          { icon: "briefcase-outline",     text: tr("اعثر على فرص عمل في حصاحيصا", "Find jobs in Hasahisa") },
+          { icon: "add-circle-outline",    text: tr("انشر إعلان وظيفتك مجاناً", "Post your job listing for free") },
+          { icon: "call-outline",          text: tr("تواصل مباشرةً مع أصحاب العمل", "Contact employers directly") },
+          { icon: "filter-outline",        text: tr("صفّح وظائف بحسب النوع والموقع", "Filter jobs by type and location") },
+        ]}
+      >
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -365,6 +412,7 @@ export default function JobsScreen() {
               onPress={() => setExpandedId(isExpanded ? null : item.id)}
             >
               <View style={styles.jobCard}>
+              <View style={[styles.accentBar, { backgroundColor: color }]} />
               <View style={[styles.jobCardTop, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
                 <View style={[styles.jobMeta, { alignItems: isRTL ? "flex-start" : "flex-end" }]}>
                   <Text style={styles.timeAgo}>{timeAgo(item.createdAt)}</Text>
@@ -442,6 +490,7 @@ export default function JobsScreen() {
           );
         }}
       />
+      </GuestGate>
 
       <AddJobModal visible={showModal} onClose={() => setShowModal(false)} onSave={saveJob} />
     </View>
@@ -505,10 +554,21 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.divider,
+  },
+  accentBar: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
   },
   jobCardTop: { flexDirection: "row-reverse", padding: 14, gap: 10 },
   jobMeta: { flexDirection: "column", alignItems: "flex-start", gap: 8, paddingTop: 2 },
