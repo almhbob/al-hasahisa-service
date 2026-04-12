@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   Modal, TextInput, ScrollView, Pressable, Alert, Platform,
-  Image, ActivityIndicator, Linking,
+  Image, ActivityIndicator, Linking, KeyboardAvoidingView,
 } from "react-native";
 import Animated, {
   FadeInDown, FadeIn, useSharedValue, useAnimatedStyle, withSpring,
@@ -529,6 +529,7 @@ function AdRequestModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <Pressable style={s.overlay} onPress={onClose}>
         <Pressable style={[s.sheet, { paddingBottom: insets.bottom + 16 }]}>
           <View style={s.sheetHandle} />
@@ -779,6 +780,7 @@ function AdRequestModal({
           </ScrollView>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
