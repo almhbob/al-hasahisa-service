@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   TextInput, Modal, Pressable, ActivityIndicator,
-  Alert, KeyboardAvoidingView, Platform,
+  Alert, KeyboardAvoidingView, Platform, AppState,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +12,8 @@ import { useAuth } from "@/lib/auth-context";
 import GuestGate from "@/components/GuestGate";
 import Colors from "@/constants/colors";
 import UserAvatar from "@/components/UserAvatar";
+import * as Haptics from "expo-haptics";
+import { scheduleLocalNotification } from "@/lib/firebase/notifications";
 import {
   useApiChats, apiGetUsers, apiGetOrCreateChat,
   getOtherUser, getMyUnread, ApiChat, ApiUser,
@@ -176,6 +178,21 @@ export default function ChatScreen() {
 
   const myId = user?.id ?? 0;
   const { chats, loading, refresh } = useApiChats(isGuest ? null : token);
+
+  // ── نغمة تنبيه عند وصول رسائل جديدة ──────────────────────────────────────
+  const prevUnreadRef = useRef(0);
+  useEffect(() => {
+    if (!chats.length) return;
+    const totalUnread = chats.reduce((sum, c) => sum + getMyUnread(c, myId), 0);
+    if (totalUnread > prevUnreadRef.current && prevUnreadRef.current >= 0) {
+      const appState = AppState.currentState;
+      if (appState === "active") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        scheduleLocalNotification({ title: "رسالة جديدة 💬", body: "لديك رسالة جديدة في الدردشة" });
+      }
+    }
+    prevUnreadRef.current = totalUnread;
+  }, [chats, myId]);
 
   useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
 
